@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BigProject</string>
+    <string name="loading_screen">loading_screen</string>
+</resources>

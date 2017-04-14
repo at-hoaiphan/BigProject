@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#9b0082fc">
+
+    <ImageView
+        android:id="@+id/imgLocation"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/img_theme_galaxy" />
+
+    <TextView
+        android:id="@+id/tvMarkerTitle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_toEndOf="@+id/imgLocation"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvMarkerLongLat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imgLocation"
+        android:layout_alignLeft="@+id/tvMarkerTitle" />
+</RelativeLayout>
