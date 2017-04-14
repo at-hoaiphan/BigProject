@@ -8,14 +8,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,13 +27,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
+
 import java.util.ArrayList;
 
-public class MapActivity extends AppCompatActivity implements LocationListener,
-        GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
+@EActivity(R.layout.activity_main)
+public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
 
-    private ViewPager mViewPager;
+    @ViewById(R.id.viewpager_location)
+    ViewPager mViewPager;
 
     private ArrayList<MyMarker> mMyMarkers = MockMarker.getData();
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
@@ -46,13 +49,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener,
     // value 8bit (value < 256).
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.google_map);
-
-        mViewPager = (ViewPager) findViewById(R.id.viewpager_location);
-    // Create Progress Bar
+    @AfterViews
+    void afterViews() {
+        // Create Progress Bar
         myProgress = new ProgressDialog(this);
         myProgress.setTitle("Map Loading ...");
         myProgress.setMessage("Please wait...");
@@ -111,7 +110,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener,
             option.title(myMarker.getMarkerTitle());
             option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
             option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
-            option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop));
+            option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
             Marker marker = myMap.addMarker(option);
             mListMarkers.add(marker);
             marker.showInfoWindow();
@@ -125,7 +124,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener,
                         mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
                         mViewPager.setCurrentItem(i, true);
                         if (previousSelectedMarker != null) {
-                            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop));
+                            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                         }
                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
                         previousSelectedMarker = marker;
@@ -264,7 +263,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener,
                 @Override
                 public boolean onMyLocationButtonClick() {
                     if (previousSelectedMarker != null) {
-                        previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                        previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
                     myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     currentMarker.showInfoWindow();
@@ -286,7 +285,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener,
                 .build();                   // Creates a CameraPosition from the builder
         myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         if (previousSelectedMarker != null) {
-            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop));
+            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
         }
         mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
         mListMarkers.get(position).showInfoWindow();

@@ -28,7 +28,7 @@ public class SplashActivity extends AppCompatActivity{
                 } finally {
 
                     Intent i = new Intent(SplashActivity.this,
-                            MapActivity.class);
+                            MapActivity_.class);
                     startActivity(i);
                     finish();
                 }

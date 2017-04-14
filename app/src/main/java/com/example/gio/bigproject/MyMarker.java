@@ -2,10 +2,10 @@ package com.example.gio.bigproject;
 
 /**
  * Copyright by Gio.
- * Created on 4/3/2017.
+ * Created on 4/14/2017.
  */
 
-public class MyMarker {
+class MyMarker {
     private int markerId;
     private String markerTitle;
     private double markerLongitude;
@@ -51,4 +51,5 @@ public class MyMarker {
         this.markerLongitude = markerLongitude;
         this.markerLatitude = markerLatitude;
     }
+
 }

@@ -75,4 +75,3 @@ public class ViewPagerMarker extends Fragment {
 //        return view;
 //    }
 }
-

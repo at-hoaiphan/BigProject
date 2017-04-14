@@ -9,8 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  * Created on 4/14/2017.
  */
 
-public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter {
-
+class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
     private int count = 10;
 
     public ViewPagerMarkerAdapter(FragmentManager fm) {
