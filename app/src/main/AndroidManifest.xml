@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MapActivity_"/>
+        <activity android:name=".data.AnswersActivity_"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

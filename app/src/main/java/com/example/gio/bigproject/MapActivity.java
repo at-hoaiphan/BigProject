@@ -233,7 +233,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Với Android API >= 23 phải catch SecurityException.
         catch (SecurityException e) {
-            Toast.makeText(this, "Show My Location Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Show My LocaBus Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
             return;
         }
@@ -252,7 +252,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
             // Thêm MyMarker cho Map:
             MarkerOptions option = new MarkerOptions();
-            option.title("My Location!");
+            option.title("My LocaBus!");
             option.snippet(myLocation.getLatitude() + "+" + myLocation.getLongitude());
             option.position(latLng);
             option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location));
@@ -271,7 +271,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 }
             });
         } else {
-            Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "LocaBus not found!", Toast.LENGTH_LONG).show();
         }
     }
 
