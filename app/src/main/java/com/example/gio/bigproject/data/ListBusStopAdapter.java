@@ -19,7 +19,7 @@ import java.util.List;
  * Created on 4/5/2017.
  */
 
-public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHolder> {
+public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
 
     private List<Result> mItems;
     private Context mContext;
@@ -39,13 +39,13 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
         }
     }
 
-    public AnswersAdapter(Context context, List<Result> posts) {
+    public ListBusStopAdapter(Context context, List<Result> posts) {
         mItems = posts;
         mContext = context;
     }
 
     @Override
-    public AnswersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListBusStopAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -56,7 +56,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(AnswersAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
 
         Result item = mItems.get(position);
         TextView tvIdStation = holder.tvIdStation;

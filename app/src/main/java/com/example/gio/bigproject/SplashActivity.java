@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.example.gio.bigproject.data.AnswersActivity_;
-
 /**
  * Copyright by Gio.
  * Created on 4/14/2017.
@@ -24,13 +22,13 @@ public class SplashActivity extends AppCompatActivity{
             public void run() {
                 try {
                     super.run();
-                    sleep(5000);  //Delay of 10 seconds
+                    sleep(2000);  //Delay of 10 seconds
                 } catch (Exception e) {
                     Log.d("Error Splash Screen", "run: ");
                 } finally {
 
                     Intent i = new Intent(SplashActivity.this,
-                            AnswersActivity_.class);
+                            MapActivity_.class);
                     startActivity(i);
                     finish();
                 }

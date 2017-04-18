@@ -25,18 +25,18 @@ import retrofit2.Response;
  * Created on 4/5/2017.
  */
 @EActivity(R.layout.activity_answer_api)
-public class AnswersActivity extends AppCompatActivity {
+public class ListBusStopActivity extends AppCompatActivity {
     @ViewById(R.id.rv_answers)
     RecyclerView mRecyclerView;
 
-    private AnswersAdapter mAdapter;
+    private ListBusStopAdapter mAdapter;
     private SOServiceBus mService;
     private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
         mService = ApiUtilsBus.getSOService();
-        mAdapter = new AnswersAdapter(this, mResults);
+        mAdapter = new ListBusStopAdapter(this, mResults);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);

@@ -4,7 +4,6 @@ import com.example.gio.bigproject.data.model.SOStationsResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
 
 /**
  * Copyright by Gio.
@@ -12,10 +11,10 @@ import retrofit2.http.Query;
  */
 
 public interface SOServiceBus {
+    public static final double LATITUDE = 16.08;
+    public static final double LONGITUDE = 108.22;
+    public static final String QUERY = "tram xe buyt";
 
-    @GET("json?query=xe+buyt&location=16.08,108.22&radius=10000&key=AIzaSyDjJotwDoyLtG6RLKbXhsi56-c9dbjByOg")
+    @GET("json?query=" + QUERY + "&location=" + LATITUDE +"," + LONGITUDE + "&key=AIzaSyDY_ANoasVU2WmFVmYfq9fK0sCbxj9Ivhc")
     Call<SOStationsResponse> getAnswers();
-
-    @GET("/maps/api/place/textsearch/json?query=xe+buyt&location=16.08,108.22&radius=10000&key=AIzaSyDjJotwDoyLtG6RLKbXhsi56-c9dbjByOg")
-    Call<SOStationsResponse> getAnswers(@Query("tagged") String tags);
 }
