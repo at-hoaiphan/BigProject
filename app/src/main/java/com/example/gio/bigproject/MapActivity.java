@@ -8,13 +8,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -85,7 +86,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Map loaded
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-
             @Override
             public void onMapLoaded() {
                 // Đã tải thành công thì tắt Dialog Progress đi
@@ -104,16 +104,21 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setMyLocationEnabled(true);
 
         // Add marker
-        for (int i = 0; i < mMyMarkers.size(); i++) {
-            MyMarker myMarker = mMyMarkers.get(i);
-            MarkerOptions option = new MarkerOptions();
-            option.title(myMarker.getMarkerTitle());
-            option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
-            option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
-            option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-            Marker marker = myMap.addMarker(option);
-            mListMarkers.add(marker);
-            marker.showInfoWindow();
+        Log.d("MapActivity sizeResult", "onMyMapReady: " + mMyMarkers.size());
+        if (mMyMarkers.size() > 0 ) {
+            for (int i = 0; i < mMyMarkers.size(); i++) {
+                MyMarker myMarker = mMyMarkers.get(i);
+                MarkerOptions option = new MarkerOptions();
+                option.title(myMarker.getMarkerTitle());
+                option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
+                option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
+                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+                Marker marker = myMap.addMarker(option);
+                mListMarkers.add(marker);
+                marker.showInfoWindow();
+            }
+        } else {
+            Toast.makeText(this, "Load API failed", Toast.LENGTH_SHORT).show();
         }
 
         myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -158,7 +163,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Show Current location.
         this.showMyLocation();
     }
-
 
     // User agree or ignore.
     @Override
@@ -233,7 +237,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Với Android API >= 23 phải catch SecurityException.
         catch (SecurityException e) {
-            Toast.makeText(this, "Show My Location Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Show My LocaBus Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
             return;
         }
@@ -252,7 +256,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
             // Thêm MyMarker cho Map:
             MarkerOptions option = new MarkerOptions();
-            option.title("My Location!");
+            option.title("My LocaBus!");
             option.snippet(myLocation.getLatitude() + "+" + myLocation.getLongitude());
             option.position(latLng);
             option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location));
@@ -271,10 +275,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 }
             });
         } else {
-            Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "LocaBus not found!", Toast.LENGTH_LONG).show();
         }
     }
 
+    @NonNull
     @Override
     public void onPageSelected(int position) {
         CameraPosition cameraPosition = new CameraPosition.Builder()
