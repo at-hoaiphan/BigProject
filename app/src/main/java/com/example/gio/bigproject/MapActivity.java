@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.gio.bigproject.data.model.Result;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,7 +41,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @ViewById(R.id.viewpager_location)
     ViewPager mViewPager;
 
-    private ArrayList<MyMarker> mMyMarkers = MockMarker.getData();
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
     private GoogleMap myMap;
     private ProgressDialog myProgress;
@@ -52,6 +52,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @AfterViews
     void afterViews() {
+
         // Create Progress Bar
         myProgress = new ProgressDialog(this);
         myProgress.setTitle("Map Loading ...");
@@ -88,6 +89,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                // Request data from server
+                MockMarker.createData();
+
                 // Đã tải thành công thì tắt Dialog Progress đi
                 myProgress.dismiss();
 
@@ -104,14 +108,21 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setMyLocationEnabled(true);
 
         // Add marker
-        Log.d("MapActivity sizeResult", "onMyMapReady: " + mMyMarkers.size());
-        if (mMyMarkers.size() > 0 ) {
-            for (int i = 0; i < mMyMarkers.size(); i++) {
-                MyMarker myMarker = mMyMarkers.get(i);
+        ArrayList<Result> mResults = MockMarker.getData();
+        Log.d("MapActivity sizeResult", "onMyMapReady: " + mResults.size());
+        if (mResults.size() > 0 ) {
+            for (int i = 0; i < mResults.size(); i++) {
+//                MyMarker myMarker = MockMarker.list.get(i);
                 MarkerOptions option = new MarkerOptions();
-                option.title(myMarker.getMarkerTitle());
-                option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
-                option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
+//                option.title(myMarker.getMarkerTitle());
+//                option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
+//                option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
+
+                option.title(mResults.get(i).getName());
+                option.snippet(mResults.get(i).getGeometry().getLocation().getLat()
+                        + ";" + mResults.get(i).getGeometry().getLocation().getLng());
+                option.position(new LatLng(mResults.get(i).getGeometry().getLocation().getLat(),
+                        mResults.get(i).getGeometry().getLocation().getLng()));
                 option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                 Marker marker = myMap.addMarker(option);
                 mListMarkers.add(marker);
@@ -286,7 +297,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
                 .zoom(16)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                .tilt(40)                   // Sets the tilt of the camera to 40 degrees
                 .build();                   // Creates a CameraPosition from the builder
         myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         if (previousSelectedMarker != null) {

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="#7762b2fc">
+    android:background="#aa0059ff">
 
     <ImageView
         android:id="@+id/imgLocation"
@@ -17,13 +17,15 @@
         android:layout_height="50dp"
         android:layout_toEndOf="@+id/imgLocation"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="#ff0000"/>
 
     <TextView
         android:id="@+id/tvMarkerLongLat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/tvMarkerTitle"
-        android:layout_below="@+id/tvMarkerTitle"/>
+        android:layout_below="@+id/tvMarkerTitle"
+        android:textColor="#ff0000"/>
 
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.gio.bigproject.R;
 import com.example.gio.bigproject.data.model.Result;
@@ -54,6 +55,7 @@ public class ListBusStopActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()) {
                     mAdapter.updateAnswers(response.body().getResults());
+                    mResults.addAll(response.body().getResults());
                     Log.d("MainActivity", "posts loaded from API");
                 } else {
 //                    int statusCode  = response.code();

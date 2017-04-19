@@ -11,10 +11,10 @@ import retrofit2.http.GET;
  */
 
 public interface SOServiceBus {
-    public static final double LATITUDE = 16.08;
-    public static final double LONGITUDE = 108.22;
-    public static final String QUERY = "tram xe buyt";
+    double LATITUDE = 16.08;
+    double LONGITUDE = 108.22;
+    String QUERY = "tram xe buyt";
 
-    @GET("json?query=" + QUERY + "&location=" + LATITUDE +"," + LONGITUDE + "&key=AIzaSyDY_ANoasVU2WmFVmYfq9fK0sCbxj9Ivhc")
+    @GET("json?query=" + QUERY + "&location=" + LATITUDE +"," + LONGITUDE + "&key=AIzaSyBKZMuAEviAoJsNpLzJwB0OG3M4emjI_a8")
     Call<SOStationsResponse> getAnswers();
 }

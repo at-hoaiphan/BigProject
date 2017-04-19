@@ -20,45 +20,43 @@ import retrofit2.Response;
 
 class MockMarker {
 
-    private static ArrayList<Result> mResults = new ArrayList<>();
+    private static final ArrayList<Result> mResults = new ArrayList<>();
     // Get data from Json
     private static SOServiceBus mService = ApiUtilsBus.getSOService();
+    public static int RESULT_COUNT;
+    public static void createData() {
 
-    public static ArrayList<MyMarker> getData() {
-
-        final ArrayList<MyMarker> list = new ArrayList<>();
 
         mService.getAnswers().enqueue(new Callback<SOStationsResponse>() {
             @Override
             public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
 
                 if (response.isSuccessful()) {
-                    mResults = (ArrayList<Result>) response.body().getResults();
+                    mResults.clear();
+                    mResults.addAll(response.body().getResults());
+                    RESULT_COUNT = mResults.size();
 
-                    for (int i = 0; i < mResults.size(); i++) {
-                        list.add(new MyMarker(i, mResults.get(i).getName(), mResults.get(i).getGeometry().getLocation().getLat(),
-                                mResults.get(i).getGeometry().getLocation().getLng()));
-                    }
+//                    for (int i = 0; i < mResults.size(); i++) {
+//                        list.add(new MyMarker(i, mResults.get(i).getName(), mResults.get(i).getGeometry().getLocation().getLat(),
+//                                mResults.get(i).getGeometry().getLocation().getLng()));
+//                    }
 
-                    Log.d("MockMarker sizeResult", "posts loaded from API" + mResults.size());
                 } else {
-//                    int statusCode  = response.code();
                     Log.d("MockMarker", "posts didn't load from API: ");
-                    // handle request errors depending on status code
                 }
             }
 
             @Override
             public void onFailure(Call<SOStationsResponse> call, Throwable t) {
-//                showErrorMessage();
-
-                Log.d("", "onFailure: " +call.request().url().toString());
+                Log.d("", "onFailure: " + call.request().url().toString());
                 Log.d("MockMarker", "error loading from API");
-
             }
         });
 
-        Log.d("MockMarker sizeResult", "getData: " + list.size());
-        return list;
+        Log.d("MockMarker", "posts loaded from API " + mResults.size() + " count = " + MockMarker.RESULT_COUNT);
+    }
+
+    public static ArrayList<Result> getData() {
+        return mResults;
     }
 }
