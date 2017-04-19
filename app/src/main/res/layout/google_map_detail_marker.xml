@@ -18,7 +18,7 @@
         android:layout_toEndOf="@+id/imgLocation"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#ff0000"/>
+        android:textColor="#ffffff"/>
 
     <TextView
         android:id="@+id/tvMarkerLongLat"
@@ -26,6 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/tvMarkerTitle"
         android:layout_below="@+id/tvMarkerTitle"
-        android:textColor="#ff0000"/>
+        android:textColor="#ffffff"/>
 
 </RelativeLayout>

@@ -3,9 +3,12 @@ package com.example.gio.bigproject;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.gio.bigproject.data.SOServiceBus;
 import com.example.gio.bigproject.data.model.Result;
+import com.squareup.picasso.Picasso;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -25,7 +28,9 @@ public class ViewPagerMarker extends Fragment {
     TextView tvMarkerTitle;
     @ViewById(R.id.tvMarkerLongLat)
     TextView tvmarkerLongLat;
-
+    @ViewById(R.id.imgLocation)
+    ImageView imgLocaton;
+    private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
     public ViewPagerMarker() {
     }
 
@@ -76,6 +81,12 @@ public class ViewPagerMarker extends Fragment {
             tvMarkerTitle.setText(mResults.get(position).getName());
             tvmarkerLongLat.setText(String.valueOf("Lat: " + mResults.get(position).getGeometry().getLocation().getLat())
                     + "; Long: " + String.valueOf(mResults.get(position).getGeometry().getLocation().getLng()));
+            try {
+                String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
+                Picasso.with(this.getContext()).load(referencePhotoLink + string + "&key=" + SOServiceBus.KEY).into(imgLocaton);
+            } catch (Exception e) {
+                Log.d("Exception", "afterViews: Photo_Reference null");
+            }
         }
     }
 

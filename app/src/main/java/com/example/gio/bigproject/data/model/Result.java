@@ -4,6 +4,8 @@ package com.example.gio.bigproject.data.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Copyright by Gio.
  * Created on 4/17/2017.
@@ -18,7 +20,18 @@ public class Result {
     private String name;
     @SerializedName("rating")
     @Expose
-    private Double rating;
+    private Double rating;@SerializedName("photos")
+    @Expose
+    private List<Photos> photos = null;
+
+    public List<Photos> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photos> photos) {
+        this.photos = photos;
+    }
+
     public Geometry getGeometry() {
         return geometry;
     }

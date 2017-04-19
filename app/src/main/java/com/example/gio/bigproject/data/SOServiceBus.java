@@ -14,7 +14,8 @@ public interface SOServiceBus {
     double LATITUDE = 16.08;
     double LONGITUDE = 108.22;
     String QUERY = "tram xe buyt";
+    String KEY = "AIzaSyBKZMuAEviAoJsNpLzJwB0OG3M4emjI_a8";
 
-    @GET("json?query=" + QUERY + "&location=" + LATITUDE +"," + LONGITUDE + "&key=AIzaSyBKZMuAEviAoJsNpLzJwB0OG3M4emjI_a8")
+    @GET("json?query=" + QUERY + "&location=" + LATITUDE +"," + LONGITUDE + "&key=" + KEY)
     Call<SOStationsResponse> getAnswers();
 }
