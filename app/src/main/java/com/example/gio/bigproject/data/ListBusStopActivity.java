@@ -54,6 +54,7 @@ public class ListBusStopActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()) {
                     mAdapter.updateAnswers(response.body().getResults());
+                    mResults.addAll(response.body().getResults());
                     Log.d("MainActivity", "posts loaded from API");
                 } else {
 //                    int statusCode  = response.code();

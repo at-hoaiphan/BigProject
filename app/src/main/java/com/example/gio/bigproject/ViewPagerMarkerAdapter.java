@@ -10,7 +10,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  */
 
 class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
-    private int count = 10;
+    private int count = MockMarker.RESULT_COUNT;
 
     public ViewPagerMarkerAdapter(FragmentManager fm) {
         super(fm);
@@ -22,8 +22,7 @@ class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
     }
 
     @Override
-    public int getCount() {
-        return count;
+    public int getCount() { return count;
     }
 
     @Override
