@@ -1,15 +1,14 @@
-package com.example.gio.bigproject.data.model;
+package com.example.gio.bigproject.model.direction;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Copyright by Gio.
- * Created on 4/17/2017.
+ * Created on 4/20/2017.
  */
 
-public class LocaBus {
-
+public class StartLocation {
     @SerializedName("lat")
     @Expose
     private Double lat;
@@ -17,20 +16,20 @@ public class LocaBus {
     @Expose
     private Double lng;
 
-    public Double getLat() {
-        return lat;
-    }
-
     public void setLat(Double lat) {
         this.lat = lat;
-    }
-
-    public Double getLng() {
-        return lng;
     }
 
     public void setLng(Double lng) {
         this.lng = lng;
     }
 
+    public Double getLat() {
+
+        return lat;
+    }
+
+    public Double getLng() {
+        return lng;
+    }
 }

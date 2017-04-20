@@ -7,8 +7,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.example.gio.bigproject.data.SOServiceBus;
-import com.example.gio.bigproject.data.model.Result;
+import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.model.bus_stop.Result;
 import com.squareup.picasso.Picasso;
 
 import org.androidannotations.annotations.AfterViews;
@@ -51,7 +51,7 @@ public class ViewPagerMarker extends Fragment {
 //        // Get data from Json
 //        SOServiceBus mService = ApiUtilsBus.getSOService();
 //        final int finalPosition = position;
-//        mService.getAnswers().enqueue(new Callback<SOStationsResponse>() {
+//        mService.getBusStop().enqueue(new Callback<SOStationsResponse>() {
 //            @Override
 //            public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
 //
@@ -81,8 +81,8 @@ public class ViewPagerMarker extends Fragment {
 //                    + "; Long: " + String.valueOf(mResult.getGeometry().getLocation().getLng()));
 //        }
 
-        ArrayList<Result> mResults = MockMarker.getData();
-        Log.d("ViewPagerMarker", "afterViews: " + MockMarker.getData().size());
+        ArrayList<Result> mResults = MockData.getData();
+        Log.d("ViewPagerMarker", "afterViews: " + MockData.getData().size());
         if (mResults.size() > 0) {
             tvMarkerTitle.setText(mResults.get(position).getName());
             tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mResults.get(position).getGeometry().getLocation().getLat())
@@ -90,7 +90,7 @@ public class ViewPagerMarker extends Fragment {
             try {
                 String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
                 Picasso.with(this.getContext())
-                        .load(referencePhotoLink + string + "&key=" + SOServiceBus.KEY)
+                        .load(referencePhotoLink + string + "&key=" + ApiUtilsBus.KEY)
                         .placeholder(R.drawable.ic_replay_white)
                         .error(R.drawable.ic_error_outline_red)
                         .into(imgLocaton);
@@ -128,7 +128,7 @@ public class ViewPagerMarker extends Fragment {
 //        }
 //
 //        // Replace item on fragment
-//        mMyMarkers.addAll(MockMarker.getData());
+//        mMyMarkers.addAll(MockData.getData());
 //        MyMarker mMyMarker = mMyMarkers.get(position);
 //        tvMarkerTitle.setText(mMyMarker.getMarkerTitle());
 //        tvmarkerLongLat.setText(String.valueOf("Lat: " + mMyMarker.getMarkerLatitude())

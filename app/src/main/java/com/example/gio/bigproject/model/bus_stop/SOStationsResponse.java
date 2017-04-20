@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.data.model;
+package com.example.gio.bigproject.model.bus_stop;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

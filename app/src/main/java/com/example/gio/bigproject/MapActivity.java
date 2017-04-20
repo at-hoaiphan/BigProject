@@ -3,6 +3,7 @@ package com.example.gio.bigproject;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,7 +19,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.gio.bigproject.data.model.Result;
+import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.SOServiceDirection;
+import com.example.gio.bigproject.model.bus_stop.Result;
+import com.example.gio.bigproject.model.direction.RouteDirec;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,12 +32,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+
 
 @EActivity(R.layout.activity_main)
 public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
@@ -42,9 +48,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     ViewPager mViewPager;
 
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
+    private ArrayList<RouteDirec> mRouteDirecs = new ArrayList<>();
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private Marker previousSelectedMarker;
+    private static SOServiceDirection mSoServiceDirection = ApiUtilsBus.getSOServiceDirection();
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -90,7 +98,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             @Override
             public void onMapLoaded() {
                 // Request data from server
-                MockMarker.createData();
+                MockData.createData();
 
                 // Đã tải thành công thì tắt Dialog Progress đi
                 myProgress.dismiss();
@@ -108,11 +116,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setMyLocationEnabled(true);
 
         // Add marker
-        ArrayList<Result> mResults = MockMarker.getData();
+        ArrayList<Result> mResults = MockData.getData();
         Log.d("MapActivity sizeResult", "onMyMapReady: " + mResults.size());
         if (mResults.size() > 0) {
             for (int i = 0; i < mResults.size(); i++) {
-//                MyMarker myMarker = MockMarker.list.get(i);
+//                MyMarker myMarker = MockData.list.get(i);
                 MarkerOptions option = new MarkerOptions();
 //                option.title(myMarker.getMarkerTitle());
 //                option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
@@ -128,6 +136,18 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 mListMarkers.add(marker);
                 marker.showInfoWindow();
             }
+
+
+            // Draw polylines
+            PolylineOptions polylineOptions = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+            for (int i = 0; i < mResults.size(); i++) {
+                polylineOptions.add(new LatLng(mResults.get(i).getGeometry().getLocation().getLat(),
+                        mResults.get(i).getGeometry().getLocation().getLng()));
+            }
+            myMap.addPolyline(polylineOptions);
+
+
+
         } else {
             Toast.makeText(this, "Load API failed", Toast.LENGTH_SHORT).show();
         }
@@ -171,7 +191,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             }
         }
 
-        // Show Current location.
+        // Show Current location
         this.showMyLocation();
     }
 
@@ -305,6 +325,30 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
         mListMarkers.get(position).showInfoWindow();
         previousSelectedMarker = mListMarkers.get(position);
+    }
+
+    private void requestPlacesDirection() {
+
+//        // Get places direc
+//        mSoServiceDirection.getPlacesDirection("16.08,108.22", "16.078,108.2", ApiUtilsBus.KEY)
+//                .enqueue(new Callback<SOPlacesDirectionResponse>() {
+//                    @Override
+//                    public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+//                        if (response.isSuccessful()) {
+//                            mRouteDirecs.clear();
+//                            mRouteDirecs.addAll(response.body().getRoutes());
+////                                RESULT_COUNT = mRouteDirecs.size();
+//                        } else {
+//                            Log.d("MockData", "posts didn't load from API: ");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+//                        Log.d("", "onFailure: " + call.request().url().toString());
+//                        Log.d("MockData", "error loading from API");
+//                    }
+//                });
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.data;
+package com.example.gio.bigproject;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.data.model.Result;
+import com.example.gio.bigproject.model.bus_stop.Result;
 
 import java.util.List;
 
