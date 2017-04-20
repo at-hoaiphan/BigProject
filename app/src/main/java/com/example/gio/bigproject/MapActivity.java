@@ -110,7 +110,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Add marker
         ArrayList<Result> mResults = MockMarker.getData();
         Log.d("MapActivity sizeResult", "onMyMapReady: " + mResults.size());
-        if (mResults.size() > 0 ) {
+        if (mResults.size() > 0) {
             for (int i = 0; i < mResults.size(); i++) {
 //                MyMarker myMarker = MockMarker.list.get(i);
                 MarkerOptions option = new MarkerOptions();
@@ -290,7 +290,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
     }
 
-    @NonNull
     @Override
     public void onPageSelected(int position) {
         CameraPosition cameraPosition = new CameraPosition.Builder()

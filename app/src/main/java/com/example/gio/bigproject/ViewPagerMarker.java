@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.gio.bigproject.data.SOServiceBus;
@@ -28,9 +29,14 @@ public class ViewPagerMarker extends Fragment {
     TextView tvMarkerTitle;
     @ViewById(R.id.tvMarkerLongLat)
     TextView tvmarkerLongLat;
+    @ViewById(R.id.tvRating)
+    TextView tvRating;
+    @ViewById(R.id.ratingBar)
+    RatingBar ratingBar;
     @ViewById(R.id.imgLocation)
     ImageView imgLocaton;
     private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
+
     public ViewPagerMarker() {
     }
 
@@ -79,13 +85,23 @@ public class ViewPagerMarker extends Fragment {
         Log.d("ViewPagerMarker", "afterViews: " + MockMarker.getData().size());
         if (mResults.size() > 0) {
             tvMarkerTitle.setText(mResults.get(position).getName());
-            tvmarkerLongLat.setText(String.valueOf("Lat: " + mResults.get(position).getGeometry().getLocation().getLat())
-                    + "; Long: " + String.valueOf(mResults.get(position).getGeometry().getLocation().getLng()));
+            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mResults.get(position).getGeometry().getLocation().getLat())
+                    + "; " + String.valueOf(mResults.get(position).getGeometry().getLocation().getLng()));
             try {
                 String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
-                Picasso.with(this.getContext()).load(referencePhotoLink + string + "&key=" + SOServiceBus.KEY).into(imgLocaton);
+                Picasso.with(this.getContext())
+                        .load(referencePhotoLink + string + "&key=" + SOServiceBus.KEY)
+                        .placeholder(R.drawable.ic_replay_white)
+                        .error(R.drawable.ic_error_outline_red)
+                        .into(imgLocaton);
+                Double rate = mResults.get(position).getRating();
+                String rateStr = "Rating: " + String.valueOf(mResults.get(position).getRating());
+                Log.d("rate", "afterViews: " + rate);
+                tvRating.setText(rateStr);
+                ratingBar.setRating(Float.parseFloat(String.valueOf(mResults.get(position).getRating())));
             } catch (Exception e) {
-                Log.d("Exception", "afterViews: Photo_Reference null");
+                tvRating.setText("Rating: Non");
+                ratingBar.setRating(0f);
             }
         }
     }
