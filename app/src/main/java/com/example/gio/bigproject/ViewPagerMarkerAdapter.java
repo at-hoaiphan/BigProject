@@ -3,6 +3,7 @@ package com.example.gio.bigproject;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 /**
  * Copyright by Gio.
@@ -10,7 +11,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  */
 
 class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
-    private int count = MockMarker.RESULT_COUNT;
+    private int count = MockData.RESULT_COUNT;
 
     public ViewPagerMarkerAdapter(FragmentManager fm) {
         super(fm);
@@ -28,7 +29,7 @@ class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
     @Override
     public CharSequence getPageTitle(int position) {
 
-        return String.valueOf(position + 1);
+        return String.valueOf(position);
     }
 
     public int getItemPosition(Object object) {

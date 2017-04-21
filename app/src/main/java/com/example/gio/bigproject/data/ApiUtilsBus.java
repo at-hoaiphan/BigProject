@@ -6,9 +6,14 @@ package com.example.gio.bigproject.data;
  */
 
 public class ApiUtilsBus {
-    private static final String BASE_URL = "https://maps.googleapis.com/maps/api/place/textsearch/";
+    public static final String KEY = "AIzaSyDvs1qZM4Efpow9sinhsRCZbXIB24NTVcg";
+    private static final String BASE_URL = "https://maps.googleapis.com/maps/api/";
 
     public static SOServiceBus getSOService() {
         return BusRetrofitClient.getClient(BASE_URL).create(SOServiceBus.class);
+    }
+
+    public static SOServiceDirection getSOServiceDirection() {
+        return BusRetrofitClient.getClient(BASE_URL).create(SOServiceDirection.class);
     }
 }

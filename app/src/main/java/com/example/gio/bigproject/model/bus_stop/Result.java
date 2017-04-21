@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.data.model;
+package com.example.gio.bigproject.model.bus_stop;
 
 
 import com.google.gson.annotations.Expose;
@@ -20,7 +20,8 @@ public class Result {
     private String name;
     @SerializedName("rating")
     @Expose
-    private Double rating;@SerializedName("photos")
+    private Double rating;
+    @SerializedName("photos")
     @Expose
     private List<Photos> photos = null;
 

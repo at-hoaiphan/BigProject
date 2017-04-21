@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.data;
+package com.example.gio.bigproject;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -6,9 +6,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.data.model.Result;
-import com.example.gio.bigproject.data.model.SOStationsResponse;
+import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.SOServiceBus;
+import com.example.gio.bigproject.model.bus_stop.Result;
+import com.example.gio.bigproject.model.bus_stop.SOStationsResponse;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -31,6 +32,7 @@ public class ListBusStopActivity extends AppCompatActivity {
 
     private ListBusStopAdapter mAdapter;
     private SOServiceBus mService;
+
     private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
@@ -48,17 +50,18 @@ public class ListBusStopActivity extends AppCompatActivity {
     }
 
     public void loadAnswers() {
-        mService.getAnswers().enqueue(new Callback<SOStationsResponse>() {
+        mService.getBusStop("tram xe buyt", "16.08,108.22", ApiUtilsBus.KEY)
+                .enqueue(new Callback<SOStationsResponse>() {
             @Override
             public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
 
                 if (response.isSuccessful()) {
                     mAdapter.updateAnswers(response.body().getResults());
                     mResults.addAll(response.body().getResults());
-                    Log.d("MainActivity", "posts loaded from API");
+                    Log.d("LisBusStopActivity", "Results loaded from API busStop" + mResults.size());
                 } else {
 //                    int statusCode  = response.code();
-                    Log.d("MainActivity", "posts didn't load from API: ");
+                    Log.d("LisBusStopActivity", "Results didn't load from API: ");
                     // handle request errors depending on status code
                 }
             }
@@ -67,12 +70,10 @@ public class ListBusStopActivity extends AppCompatActivity {
             public void onFailure(Call<SOStationsResponse> call, Throwable t) {
 //                showErrorMessage();
 
-                Log.d("", "onFailure: " +call.request().url().toString());
-                Log.d("MainActivity", "error loading from API");
+                Log.d("", "onFailure: " + call.request().url().toString());
+                Log.d("LisBusStopActivity", "Load Bus Stop failed from API");
 
             }
         });
     }
-
-
 }

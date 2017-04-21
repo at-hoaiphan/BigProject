@@ -3,6 +3,7 @@ package com.example.gio.bigproject;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,7 +19,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.gio.bigproject.data.model.Result;
+import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.SOServiceDirection;
+import com.example.gio.bigproject.model.bus_stop.Result;
+import com.example.gio.bigproject.model.direction.RouteDirec;
+import com.example.gio.bigproject.model.direction.SOPlacesDirectionResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,6 +33,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -35,16 +42,26 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+
 @EActivity(R.layout.activity_main)
 public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
 
     @ViewById(R.id.viewpager_location)
     ViewPager mViewPager;
 
+    private SOServiceDirection mSoServiceDirection;
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
+    private ArrayList<RouteDirec> mRoutes = new ArrayList<>();
+    private ArrayList<Result> mResults = new ArrayList<>();
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private Marker previousSelectedMarker;
+    private Location myLocation;
+    private Polyline mPolyline;
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -53,6 +70,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @AfterViews
     void afterViews() {
 
+        // Request data from server
+        MockData.createData();
+        mSoServiceDirection = ApiUtilsBus.getSOServiceDirection();
         // Create Progress Bar
         myProgress = new ProgressDialog(this);
         myProgress.setTitle("Map Loading ...");
@@ -72,10 +92,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             }
         });
 
-        // Add Detail location
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        ViewPagerMarkerAdapter mAdapter = new ViewPagerMarkerAdapter(fragmentManager);
-        mViewPager.setAdapter(mAdapter);
 
         // Set onPageChange
         mViewPager.setOnPageChangeListener(this);
@@ -89,12 +105,52 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                // Request data from server
-                MockMarker.createData();
 
                 // Đã tải thành công thì tắt Dialog Progress đi
                 myProgress.dismiss();
 
+                // Add Detail location
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                ViewPagerMarkerAdapter mAdapter = new ViewPagerMarkerAdapter(fragmentManager);
+                mViewPager.setAdapter(mAdapter);
+                // Add marker
+                mResults = MockData.getData();
+                Log.d("MapActivity sizeResult", "onMyMapReady: " + mResults.size());
+                if (mResults.size() > 0) {
+                    for (int i = 0; i < mResults.size(); i++) {
+                        MarkerOptions option = new MarkerOptions();
+                        option.title(mResults.get(i).getName());
+                        option.snippet(mResults.get(i).getGeometry().getLocation().getLat()
+                                + ";" + mResults.get(i).getGeometry().getLocation().getLng());
+                        option.position(new LatLng(mResults.get(i).getGeometry().getLocation().getLat(),
+                                mResults.get(i).getGeometry().getLocation().getLng()));
+                        option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+                        Marker marker = myMap.addMarker(option);
+                        mListMarkers.add(marker);
+                        marker.showInfoWindow();
+                    }
+
+                } else {
+                    Toast.makeText(getBaseContext(), "Load API failed, Please restart app again!", Toast.LENGTH_SHORT).show();
+                }
+
+                myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        for (int i = 0; i < mListMarkers.size(); i++) {
+                            if (marker.equals(mListMarkers.get(i))) {
+                                mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                                mViewPager.setCurrentItem(i, true);
+                                if (previousSelectedMarker != null) {
+                                    previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+                                }
+                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                                previousSelectedMarker = marker;
+                            }
+                        }
+                        return false;
+                    }
+                });
                 // Hiển thị vị trí người dùng.
                 askPermissionsAndShowMyLocation();
             }
@@ -107,48 +163,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
         myMap.setMyLocationEnabled(true);
 
-        // Add marker
-        ArrayList<Result> mResults = MockMarker.getData();
-        Log.d("MapActivity sizeResult", "onMyMapReady: " + mResults.size());
-        if (mResults.size() > 0) {
-            for (int i = 0; i < mResults.size(); i++) {
-//                MyMarker myMarker = MockMarker.list.get(i);
-                MarkerOptions option = new MarkerOptions();
-//                option.title(myMarker.getMarkerTitle());
-//                option.snippet(myMarker.getMarkerLatitude() + ";" + myMarker.getMarkerLongitude());
-//                option.position(new LatLng(myMarker.getMarkerLatitude(), myMarker.getMarkerLongitude()));
 
-                option.title(mResults.get(i).getName());
-                option.snippet(mResults.get(i).getGeometry().getLocation().getLat()
-                        + ";" + mResults.get(i).getGeometry().getLocation().getLng());
-                option.position(new LatLng(mResults.get(i).getGeometry().getLocation().getLat(),
-                        mResults.get(i).getGeometry().getLocation().getLng()));
-                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-                Marker marker = myMap.addMarker(option);
-                mListMarkers.add(marker);
-                marker.showInfoWindow();
-            }
-        } else {
-            Toast.makeText(this, "Load API failed", Toast.LENGTH_SHORT).show();
-        }
-
-        myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                for (int i = 0; i < mListMarkers.size(); i++) {
-                    if (marker.equals(mListMarkers.get(i))) {
-                        mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
-                        mViewPager.setCurrentItem(i, true);
-                        if (previousSelectedMarker != null) {
-                            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-                        }
-                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
-                        previousSelectedMarker = marker;
-                    }
-                }
-                return false;
-            }
-        });
     }
 
     private void askPermissionsAndShowMyLocation() {
@@ -171,7 +186,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             }
         }
 
-        // Show Current location.
+        // Show Current location
         this.showMyLocation();
     }
 
@@ -234,7 +249,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Met
         final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
-        Location myLocation;
         try {
             // Đoạn code nay cần người dùng cho phép (Hỏi ở trên ***).
             locationManager.requestLocationUpdates(
@@ -277,11 +291,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             myMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
+                    mPolyline.remove();
                     if (previousSelectedMarker != null) {
                         previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
                     myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     currentMarker.showInfoWindow();
+
                     return true;
                 }
             });
@@ -292,6 +308,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Override
     public void onPageSelected(int position) {
+        Log.d("MapActivity", "onPageSelected: " + mResults.size());
+        loadDirections(position);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
                 .zoom(16)                   // Sets the zoom
@@ -303,8 +321,61 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
         }
         mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+
+        // Display distance and duration of Destination
+        if (mRoutes.size() > 0) {
+            mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+                    + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+        }
         mListMarkers.get(position).showInfoWindow();
         previousSelectedMarker = mListMarkers.get(position);
+    }
+
+    private void loadDirections(int position) {
+        mSoServiceDirection.getPlacesDirection(String.valueOf(myLocation.getLatitude())
+                        + "," + String.valueOf(myLocation.getLongitude()),
+                mListMarkers.get(position).getPosition().latitude
+                        + "," + mListMarkers.get(position).getPosition().longitude,
+                "walking",
+                ApiUtilsBus.KEY)
+                .enqueue(new Callback<SOPlacesDirectionResponse>() {
+                    @Override
+                    public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+
+                        if (response.isSuccessful()) {
+                            mRoutes.clear();
+                            mRoutes.addAll(response.body().getRoutes());
+                            drawDirection();
+                            Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
+                        } else {
+//                    int statusCode  = response.code();
+                            Log.d("MapActivity", "Routes didn't load from API: ");
+                            // handle request errors depending on status code
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+                        Log.d("", "onFailure: " + call.request().url().toString());
+                        Log.d("MapActivity", "Load Direc Places failed from API");
+                    }
+                });
+    }
+
+    private void drawDirection() {
+        // Clear old direction
+        if (mPolyline != null) {
+            mPolyline.remove();
+        }
+        // Draw polylines
+        PolylineOptions polylineOptions = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+        for (int i = 0; i < mRoutes.get(0).getLegs().get(0).getSteps().size(); i++) {
+            polylineOptions.add(new LatLng(mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLat(),
+                    mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLng()));
+        }
+        // End Places
+        polylineOptions.add(new LatLng(mRoutes.get(0).getLegs().get(0).getEndLocation().getLat(), mRoutes.get(0).getLegs().get(0).getEndLocation().getLng()));
+        mPolyline = myMap.addPolyline(polylineOptions);
     }
 
     @Override
