@@ -2,7 +2,6 @@ package com.example.gio.bigproject;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +62,6 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         tvIdStation.setText(String.valueOf(item.getGeometry().getLocation().getLat()) + ";"
                 + String.valueOf(item.getGeometry().getLocation().getLng()));
         tvNameStation.setText(item.getName());
-        Log.d("", "onBindViewHolder: " + item.getGeometry().getLocation().getLat());
 
         holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
     }

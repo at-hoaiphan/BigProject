@@ -26,7 +26,7 @@ public class Legs {
     private StartLocation startLocation;
     @SerializedName("steps")
     @Expose
-    private List<Steps> steps;
+    private List<Step> steps;
 
     public void setDistance(Distance distance) {
         this.distance = distance;
@@ -44,7 +44,7 @@ public class Legs {
         this.startLocation = startLocation;
     }
 
-    public void setSteps(List<Steps> steps) {
+    public void setSteps(List<Step> steps) {
         this.steps = steps;
     }
 
@@ -65,7 +65,7 @@ public class Legs {
         return startLocation;
     }
 
-    public List<Steps> getSteps() {
+    public List<Step> getSteps() {
         return steps;
     }
 }

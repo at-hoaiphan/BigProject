@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".data.ListBusStopActivity_"/>
+        <activity android:name=".ListBusStopActivity_"/>
         <activity android:name=".SplashActivity"/>
 
         <meta-data
@@ -30,7 +30,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCWRI3EjJmfetSH3hK-NoZY_wMGPXx5ncg" />
+            android:value="AIzaSyDvs1qZM4Efpow9sinhsRCZbXIB24NTVcg" />
 
     </application>
 

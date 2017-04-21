@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  * Created on 4/20/2017.
  */
 
-public class Steps {
+public class Step {
     @SerializedName("start_location")
     @Expose
     private StartLocation startLocation;

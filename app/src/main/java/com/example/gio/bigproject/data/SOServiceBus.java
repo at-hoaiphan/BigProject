@@ -13,6 +13,10 @@ import retrofit2.http.Query;
 
 public interface SOServiceBus {
 
-    @GET("json")
+    @GET("place/textsearch/json")
     Call<SOStationsResponse> getBusStop(@Query("query") String query, @Query("location") String location, @Query("key") String KEY);
+
+
+    @GET("place/textsearch/json?query=tram+xe+buyt&location=16.08,108.22&key=AIzaSyCWRI3EjJmfetSH3hK-NoZY_wMGPXx5ncg")
+    Call<SOStationsResponse> getBusStop();
 }

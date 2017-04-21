@@ -32,9 +32,12 @@ class MockData {
             public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
 
                 if (response.isSuccessful()) {
-                    mResults.clear();
+                    if (mResults.size() != 0) {
+                        mResults.clear();
+                    }
                     mResults.addAll(response.body().getResults());
                     RESULT_COUNT = mResults.size();
+                    Log.d("loadData", "onResponse: " + RESULT_COUNT);
                 } else {
                     Log.d("MockData", "posts didn't load from API: ");
                 }

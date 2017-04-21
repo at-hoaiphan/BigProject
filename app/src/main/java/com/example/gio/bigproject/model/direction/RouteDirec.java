@@ -14,26 +14,27 @@ public class RouteDirec {
     @SerializedName("legs")
     @Expose
     private List<Legs> legs = null;
+
+    public void setOverViewPolyline(OverViewPolyline overViewPolyline) {
+        this.overViewPolyline = overViewPolyline;
+    }
+
+    public OverViewPolyline getOverViewPolyline() {
+
+        return overViewPolyline;
+    }
+
     @SerializedName("overview_polyline")
     @Expose
-    private String overViewPolyline;
+    private OverViewPolyline overViewPolyline;
 
     public void setLegs(List<Legs> legs) {
         this.legs = legs;
     }
 
-    public void setOverViewPolyline(String overViewPolyline) {
-        this.overViewPolyline = overViewPolyline;
-    }
 
     public List<Legs> getLegs() {
 
         return legs;
     }
-
-    public String getOverViewPolyline() {
-        return overViewPolyline;
-    }
-
-
 }

@@ -11,20 +11,12 @@ import java.util.List;
  */
 
 public class SOPlacesDirectionResponse {
-
-    @SerializedName("geocoded_waypoints")
-    @Expose
-    private List<Object> geocodedWaypoints = null;
     @SerializedName("routes")
     @Expose
     private List<RouteDirec> routes = null;
     @SerializedName("status")
     @Expose
     private String status;
-
-    public void setGeocodedWaypoints(List<Object> geocodedWaypoints) {
-        this.geocodedWaypoints = geocodedWaypoints;
-    }
 
     public void setRoutes(List<RouteDirec> routes) {
         this.routes = routes;
@@ -34,10 +26,6 @@ public class SOPlacesDirectionResponse {
         this.status = status;
     }
 
-    public List<Object> getGeocodedWaypoints() {
-
-        return geocodedWaypoints;
-    }
 
     public List<RouteDirec> getRoutes() {
         return routes;
