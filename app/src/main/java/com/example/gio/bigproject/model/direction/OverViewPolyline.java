@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  * Created on 4/21/2017.
  */
 
-class OverViewPolyline {
+public class OverViewPolyline {
     @SerializedName("points")
     @Expose
     private String points;
