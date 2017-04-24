@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.MockData;
 import com.example.gio.bigproject.data.SOServiceDirection;
 import com.example.gio.bigproject.model.bus_stop.Result;
 import com.example.gio.bigproject.model.direction.RouteDirec;
@@ -307,7 +308,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Override
     public void onPageSelected(int position) {
-        Log.d("MapActivity", "onPageSelected: " + mResults.size());
         loadDirections(position);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
@@ -321,16 +321,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
         mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
 
-        // Display distance and duration of Destination
-        if (mRoutes.size() > 0) {
-            mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-                    + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
-        }
-        mListMarkers.get(position).showInfoWindow();
         previousSelectedMarker = mListMarkers.get(position);
     }
 
-    private void loadDirections(int position) {
+    private void loadDirections(final int position) {
         mSoServiceDirection.getPlacesDirection(String.valueOf(myLocation.getLatitude())
                         + "," + String.valueOf(myLocation.getLongitude()),
                 mListMarkers.get(position).getPosition().latitude
@@ -357,16 +351,25 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                                 mPolyline.remove();
                             }
                             mPolyline = myMap.addPolyline(polyOp);
+
+                            // Display distance and duration of Destination
+                            if (mRoutes.size() > 0) {
+                                mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+                                        + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+                                mListMarkers.get(position).showInfoWindow();
+                            }
                             Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
                         } else {
-                            Log.d("MapActivity", "Routes didn't load from API: ");
+//                            Log.d("MapActivity", "Routes didn't load from API: ");
+                            Toast.makeText(MapActivity.this, "Routes didn't load from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-                        Log.d("", "onFailure: " + call.request().url().toString());
-                        Log.d("MapActivity", "Load Direc Places failed from API");
+//                        Log.d("", "onFailure: " + call.request().url().toString());
+//                        Log.d("MapActivity", "Load Direc Places failed from API");
+                        Toast.makeText(MapActivity.this, "Load Direction Places failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

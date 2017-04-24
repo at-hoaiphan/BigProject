@@ -18,6 +18,15 @@ public class Legs {
     @SerializedName("duration")
     @Expose
     private Duration duration;
+
+    public String getEndAddress() {
+        return endAddress;
+    }
+
+    @SerializedName("end_address")
+    @Expose
+
+    private String endAddress;
     @SerializedName("end_location")
     @Expose
     private EndLocation endLocation;

@@ -1,9 +1,7 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.data;
 
 import android.util.Log;
 
-import com.example.gio.bigproject.data.ApiUtilsBus;
-import com.example.gio.bigproject.data.SOServiceBus;
 import com.example.gio.bigproject.model.bus_stop.Result;
 import com.example.gio.bigproject.model.bus_stop.SOStationsResponse;
 
@@ -18,7 +16,7 @@ import retrofit2.Response;
  * Created on 4/14/2017.
  */
 
-class MockData {
+public class MockData {
 
     private static final ArrayList<Result> mResults = new ArrayList<>();
     // Get data from Json
