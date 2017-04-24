@@ -291,7 +291,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             myMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
-                    mPolyline.remove();
                     if (previousSelectedMarker != null) {
                         previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
@@ -345,12 +344,22 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         if (response.isSuccessful()) {
                             mRoutes.clear();
                             mRoutes.addAll(response.body().getRoutes());
-                            drawDirection();
+
+                            // points: overview_polyline
+                            ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
+                            // Draw polylines
+                            PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+                            for (int i = 0; i < arrDecode.size(); i++) {
+                                polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+                            }
+                            // Clear old direction
+                            if (mPolyline != null) {
+                                mPolyline.remove();
+                            }
+                            mPolyline = myMap.addPolyline(polyOp);
                             Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
                         } else {
-//                    int statusCode  = response.code();
                             Log.d("MapActivity", "Routes didn't load from API: ");
-                            // handle request errors depending on status code
                         }
                     }
 
@@ -362,20 +371,33 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 });
     }
 
-    private void drawDirection() {
-        // Clear old direction
-        if (mPolyline != null) {
-            mPolyline.remove();
+    private ArrayList<LatLng> decodePoly(String encoded) {
+        ArrayList<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng position = new LatLng((double) lat / 1E5, (double) lng / 1E5);
+            poly.add(position);
         }
-        // Draw polylines
-        PolylineOptions polylineOptions = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
-        for (int i = 0; i < mRoutes.get(0).getLegs().get(0).getSteps().size(); i++) {
-            polylineOptions.add(new LatLng(mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLat(),
-                    mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLng()));
-        }
-        // End Places
-        polylineOptions.add(new LatLng(mRoutes.get(0).getLegs().get(0).getEndLocation().getLat(), mRoutes.get(0).getLegs().get(0).getEndLocation().getLng()));
-        mPolyline = myMap.addPolyline(polylineOptions);
+        return poly;
     }
 
     @Override
