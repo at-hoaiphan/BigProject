@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.BusStopDatabase;
 import com.example.gio.bigproject.data.MockData;
 import com.example.gio.bigproject.data.SOServiceDirection;
 import com.example.gio.bigproject.model.bus_stop.Result;
@@ -63,6 +64,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker previousSelectedMarker;
     private Location myLocation;
     private Polyline mPolyline;
+    private BusStopDatabase mBusStopDatabase = new BusStopDatabase(this);
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -73,6 +75,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Request data from server
         MockData.createData();
+        Log.d("Map", "afterViews: " + MockData.getData().size());
+//        Log.d("MapDB", "afterViews: " + mBusStopDatabase.getAllPlaces().size());
         mSoServiceDirection = ApiUtilsBus.getSOServiceDirection();
         // Create Progress Bar
         myProgress = new ProgressDialog(this);
@@ -368,8 +372,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     @Override
                     public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
 //                        Log.d("", "onFailure: " + call.request().url().toString());
-//                        Log.d("MapActivity", "Load Direc Places failed from API");
-                        Toast.makeText(MapActivity.this, "Load Direction Places failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
+//                        Log.d("MapActivity", "Load Direc PlaceStop failed from API");
+                        Toast.makeText(MapActivity.this, "Load Direction PlaceStop failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

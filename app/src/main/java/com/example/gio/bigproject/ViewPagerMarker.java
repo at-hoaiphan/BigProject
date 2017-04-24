@@ -49,41 +49,7 @@ public class ViewPagerMarker extends Fragment {
             position = getArguments().getInt("positionFrag");
         }
 
-//        // Get data from Json
-//        SOServiceBus mService = ApiUtilsBus.getSOService();
-//        final int finalPosition = position;
-//        mService.getBusStop().enqueue(new Callback<SOStationsResponse>() {
-//            @Override
-//            public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
-//
-//                if (response.isSuccessful()) {
-//                    mResults = (ArrayList<Result>) response.body().getResults();
-//                    Log.d("ViewPage sizeResult", "loaded API" + response.body().getResults().size());
-//
-//                } else {
-////                    int statusCode  = response.code();
-//                    Log.d("MainActivity", "posts didn't load from API: ");
-//                    // handle request errors depending on status code
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<SOStationsResponse> call, Throwable t) {
-////                showErrorMessage();
-//                Log.d("", "onFailure: " +call.request().url().toString());
-//                Log.d("MainActivity", "error loading from API");
-//
-//            }
-//        });
-//        if (mResults.size() > 0) {
-//            Result mResult = mResults.get(finalPosition);
-//            tvMarkerTitle.setText(mResult.getName());
-//            tvmarkerLongLat.setText(String.valueOf("Lat: " + mResult.getGeometry().getLocation().getLat())
-//                    + "; Long: " + String.valueOf(mResult.getGeometry().getLocation().getLng()));
-//        }
-
         ArrayList<Result> mResults = MockData.getData();
-        Log.d("ViewPagerMarker", "afterViews: " + MockData.getData().size());
         if (mResults.size() > 0) {
             tvMarkerTitle.setText(mResults.get(position).getName());
             tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mResults.get(position).getGeometry().getLocation().getLat())
