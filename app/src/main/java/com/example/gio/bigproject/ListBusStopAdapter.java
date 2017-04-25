@@ -20,14 +20,12 @@ import java.util.List;
 public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
 
     private List<Result> mItems;
-    private Context mContext;
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvIdStation;
         TextView tvNameStation;
         ImageView imgStation;
-        PostItemListener mItemListener;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -37,9 +35,8 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         }
     }
 
-    public ListBusStopAdapter(Context context, List<Result> posts) {
+    public ListBusStopAdapter(List<Result> posts) {
         mItems = posts;
-        mContext = context;
     }
 
     @Override
