@@ -2,21 +2,15 @@ package com.example.gio.bigproject;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.example.gio.bigproject.data.ApiUtilsBus;
-import com.example.gio.bigproject.data.MockData;
-import com.example.gio.bigproject.model.bus_stop.Result;
-import com.squareup.picasso.Picasso;
+import com.example.gio.bigproject.data.BusStopDatabase;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
-
-import java.util.ArrayList;
 
 /**
  * Copyright by Gio.
@@ -49,27 +43,31 @@ public class ViewPagerMarker extends Fragment {
             position = getArguments().getInt("positionFrag");
         }
 
-        ArrayList<Result> mResults = MockData.getData();
-        if (mResults.size() > 0) {
-            tvMarkerTitle.setText(mResults.get(position).getName());
-            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mResults.get(position).getGeometry().getLocation().getLat())
-                    + "; " + String.valueOf(mResults.get(position).getGeometry().getLocation().getLng()));
-            try {
-                String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
-                Picasso.with(this.getContext())
-                        .load(referencePhotoLink + string + "&key=" + ApiUtilsBus.KEY)
-                        .placeholder(R.drawable.ic_replay_white)
-                        .error(R.drawable.ic_error_outline_red)
-                        .into(imgLocaton);
-                Double rate = mResults.get(position).getRating();
-                String rateStr = "Rating: " + String.valueOf(mResults.get(position).getRating());
-                Log.d("rate", "afterViews: " + rate);
-                tvRating.setText(rateStr);
-                ratingBar.setRating(Float.parseFloat(String.valueOf(mResults.get(position).getRating())));
-            } catch (Exception e) {
-                tvRating.setText("Rating: Non");
-                ratingBar.setRating(0f);
-            }
+        // Load data from server
+//        ArrayList<Result> mResults = MockData.getData();
+
+        // Load data from local database
+        BusStopDatabase mBusStopDatabase = new BusStopDatabase(getContext());
+        if (mBusStopDatabase.getAllPlaces().size() > 0) {
+            tvMarkerTitle.setText(mBusStopDatabase.getAllPlaces().get(position).getName());
+            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mBusStopDatabase.getAllPlaces().get(position).getLatitude())
+                    + "; " + String.valueOf(mBusStopDatabase.getAllPlaces().get(position).getLongitude()));
+//            try {
+//                String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
+//                Picasso.with(this.getContext())
+//                        .load(referencePhotoLink + string + "&key=" + ApiUtilsBus.KEY)
+//                        .placeholder(R.drawable.ic_replay_white)
+//                        .error(R.drawable.ic_error_outline_red)
+//                        .into(imgLocaton);
+//                Double rate = mResults.get(position).getRating();
+//                String rateStr = "Rating: " + String.valueOf(mResults.get(position).getRating());
+//                Log.d("rate", "afterViews: " + rate);
+//                tvRating.setText(rateStr);
+//                ratingBar.setRating(Float.parseFloat(String.valueOf(mResults.get(position).getRating())));
+//            } catch (Exception e) {
+//                tvRating.setText("Rating: Non");
+//                ratingBar.setRating(0f);
+//            }
         }
     }
 

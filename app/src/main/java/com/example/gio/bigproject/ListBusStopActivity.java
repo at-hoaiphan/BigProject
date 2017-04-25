@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.gio.bigproject.data.ApiUtilsBus;
+import com.example.gio.bigproject.data.BusStopDatabase;
 import com.example.gio.bigproject.data.SOServiceBus;
 import com.example.gio.bigproject.model.bus_stop.Result;
 import com.example.gio.bigproject.model.bus_stop.SOStationsResponse;
@@ -32,13 +33,14 @@ public class ListBusStopActivity extends AppCompatActivity {
 
     private ListBusStopAdapter mAdapter;
     private SOServiceBus mService;
+    private BusStopDatabase busStopDatabase;
 
     private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
         mService = ApiUtilsBus.getSOService();
-        mAdapter = new ListBusStopAdapter(this, mResults);
+        mAdapter = new ListBusStopAdapter(mResults);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
@@ -46,10 +48,10 @@ public class ListBusStopActivity extends AppCompatActivity {
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
 
-        loadAnswers();
+        loadBusStops();
     }
 
-    public void loadAnswers() {
+    public void loadBusStops() {
         mService.getBusStop("tram xe buyt", "16.08,108.22", ApiUtilsBus.KEY)
                 .enqueue(new Callback<SOStationsResponse>() {
             @Override

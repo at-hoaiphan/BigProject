@@ -2,16 +2,14 @@ package com.example.gio.bigproject.data;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,11 +23,12 @@ import java.util.ArrayList;
 
 public class BusStopDatabase extends SQLiteOpenHelper {
     private static String DATABASE_NAME = "busstop.sqlite";
-    private static String TABLE_PLACES = "BusPlaces";
-    public final static String DATABASE_PATH = "/data/data/com.example.gio.bigproject/databases/";
-    private static final int DATABASE_VERSION = 1;
+    private static String TABLE_PLACES = "busplaces";
+    private final static String DATABASE_PATH = "/data/data/com.example.gio.bigproject/databases/";
+    private static final int DATABASE_VERSION = 2;
 
     private Context mContext;
+    private SQLiteDatabase mSqLiteDatabase;
 
     public BusStopDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,8 +36,7 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         // checking database and open it if exists
         if (checkDataBase()) {
             openDataBase();
-        } else
-        {
+        } else {
             try {
                 this.getReadableDatabase();
                 copyDataBase();
@@ -50,10 +48,6 @@ public class BusStopDatabase extends SQLiteOpenHelper {
             }
             Toast.makeText(context, "Initial database is created", Toast.LENGTH_LONG).show();
         }
-    }
-
-    public BusStopDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(context, name, factory, version, errorHandler);
     }
 
     @Override
@@ -73,7 +67,7 @@ public class BusStopDatabase extends SQLiteOpenHelper {
 
         byte[] buffer = new byte[1024];
         int length;
-        while ((length = myInput.read(buffer))>0){
+        while ((length = myInput.read(buffer)) > 0) {
             myOutput.write(buffer, 0, length);
         }
 
@@ -82,40 +76,35 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         myInput.close();
     }
 
-    public void openDataBase() throws SQLException {
+    private void openDataBase() throws SQLException {
         String dbPath = DATABASE_PATH + DATABASE_NAME;
         SQLiteDatabase dataBase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
     private boolean checkDataBase() {
-        SQLiteDatabase checkDB = null;
-        boolean exist = false;
-        try {
-            String dbPath = DATABASE_PATH + DATABASE_NAME;
-            checkDB = SQLiteDatabase.openDatabase(dbPath, null,
-                    SQLiteDatabase.OPEN_READONLY);
-        } catch (SQLiteException e) {
-            Log.v("db log", "database does't exist");
-        }
-
-        if (checkDB != null) {
-            exist = true;
-            checkDB.close();
-        }
-        return exist;
+        File dbFile = mContext.getDatabasePath(DATABASE_NAME);
+        return dbFile.exists();
     }
 
     public ArrayList<PlaceStop> getAllPlaces() {
-        ArrayList<PlaceStop> data = new ArrayList<>();
-        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + TABLE_PLACES, null);
+        mSqLiteDatabase = getWritableDatabase();
+        ArrayList<PlaceStop> listPlaces = new ArrayList<>();
+        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            data.add(new PlaceStop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3),
+            listPlaces.add(new PlaceStop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3),
                     cursor.getString(4), cursor.getString(5)));
             cursor.moveToNext();
         }
-        return data;
+        cursor.close();
+        return listPlaces;
+    }
+
+    public int getCountPlaces() {
+        SQLiteDatabase mSqLiteDatabase = getWritableDatabase();
+        ArrayList<PlaceStop> listPlaces = new ArrayList<>();
+        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES, null);
+        return cursor.getCount();
     }
 
     public PlaceStop getPlaceById(int id) {

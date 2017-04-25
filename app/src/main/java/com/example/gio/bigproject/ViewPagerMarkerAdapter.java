@@ -1,10 +1,11 @@
 package com.example.gio.bigproject;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.gio.bigproject.data.MockData;
+import com.example.gio.bigproject.data.BusStopDatabase;
 
 /**
  * Copyright by Gio.
@@ -12,10 +13,13 @@ import com.example.gio.bigproject.data.MockData;
  */
 
 class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
-    private int count = MockData.RESULT_COUNT;
+    private int count;
+    private Context context;
 
-    public ViewPagerMarkerAdapter(FragmentManager fm) {
+    public ViewPagerMarkerAdapter(Context context, FragmentManager fm) {
         super(fm);
+        this.context = context;
+        count = new BusStopDatabase(context).getCountPlaces();
     }
 
     @Override
