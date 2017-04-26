@@ -11,12 +11,14 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.data.ApiUtilsBus;
@@ -38,6 +40,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -54,15 +57,19 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @ViewById(R.id.viewpager_location)
     ViewPager mViewPager;
 
+    @ViewById(R.id.fabFindDirec)
+    FloatingActionButton fabFindDirec;
+
     private SOServiceDirection mSoServiceDirection;
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
     private ArrayList<RouteDirec> mRoutes = new ArrayList<>();
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private Marker previousSelectedMarker;
-    private Location myLocation;
     private Polyline mPolyline;
     private BusStopDatabase mBusStopDatabase;
+    private Marker currentMarker;
+    private static boolean isViewpagerVisibility = false;
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -100,6 +107,30 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mViewPager.setOnPageChangeListener(this);
     }
 
+    @Click(R.id.fabFindDirec)
+    public void clickFabFindDirec() {
+        Log.d("click fab", "clickFabFindDirec: ");
+        if (isViewpagerVisibility) {
+            // points: overview_polyline
+            ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
+            // Draw polylines
+            PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+            polyOp.add(new LatLng(currentMarker.getPosition().latitude, currentMarker.getPosition().longitude));
+            for (int i = 0; i < arrDecode.size(); i++) {
+                polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+            }
+            polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
+                    mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
+            // Clear old direction
+            if (mPolyline != null) {
+                mPolyline.remove();
+            }
+            mPolyline = myMap.addPolyline(polyOp);
+        } else {
+            Toast.makeText(this, "Please choose your destination!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void onMyMapReady(GoogleMap googleMap) {
         // Get GoogleMap object:
         myMap = googleMap;
@@ -108,6 +139,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+
+                mViewPager.setVisibility(View.GONE);
+                isViewpagerVisibility = false;
 
                 // Đã tải thành công thì tắt Dialog Progress đi
                 myProgress.dismiss();
@@ -148,7 +182,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                         Marker marker = myMap.addMarker(option);
                         mListMarkers.add(marker);
-                        marker.showInfoWindow();
                     }
 
                 } else {
@@ -158,6 +191,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
+                        mViewPager.setVisibility(View.VISIBLE);
+                        isViewpagerVisibility = true;
                         for (int i = 0; i < mListMarkers.size(); i++) {
                             if (marker.equals(mListMarkers.get(i))) {
                                 mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
@@ -255,7 +290,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     // Chỉ gọi phương thức này khi đã có quyền xem vị trí người dùng.
     private void showMyLocation() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         String locationProvider = this.getEnabledLocationProvider();
 
@@ -268,6 +303,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Met
         final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
+        Location myLocation;
         try {
             // Đoạn code nay cần người dùng cho phép (Hỏi ở trên ***).
             locationManager.requestLocationUpdates(
@@ -303,8 +339,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             option.title("My LocaBus!");
             option.snippet(myLocation.getLatitude() + "+" + myLocation.getLongitude());
             option.position(latLng);
-            option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location));
-            final Marker currentMarker = myMap.addMarker(option);
+            option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_marker));
+            currentMarker = myMap.addMarker(option);
+            currentMarker.setDraggable(true);
             currentMarker.showInfoWindow();
 
             myMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
@@ -313,6 +350,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     if (previousSelectedMarker != null) {
                         previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
+                    currentMarker.remove();
+                    showMyLocation();
+                    mPolyline.remove();
+                    loadDirections(mViewPager.getCurrentItem());
                     myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     currentMarker.showInfoWindow();
 
@@ -320,20 +361,25 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 }
             });
 
-            // TODO: 4/25/2017 demo drag marker 
             myMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                 @Override
                 public void onMarkerDragStart(Marker marker) {
-                    Log.d("MapActivity", "onResponse:  marker dragStart" + marker.getPosition().latitude);
                 }
 
                 @Override
                 public void onMarkerDrag(Marker marker) {
+                    currentMarker.setSnippet(marker.getPosition().latitude + "; " + marker.getPosition().longitude);
+                    currentMarker.showInfoWindow();
+
                 }
 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
-                    Log.d("MapActivity", "onResponse:  marker dragEnd" + marker.getPosition().latitude);
+                    currentMarker.setSnippet(marker.getPosition().latitude + "; " + marker.getPosition().longitude);
+                    Toast.makeText(MapActivity.this, "Set your loacation latitude-longitude: "
+                            + marker.getPosition().latitude
+                            + marker.getPosition().longitude, Toast.LENGTH_SHORT).show();
+                    loadDirections(mViewPager.getCurrentItem());
                 }
             });
         } else {
@@ -343,6 +389,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Override
     public void onPageSelected(int position) {
+        // Clear old direction
+        if (mPolyline != null) {
+            mPolyline.remove();
+        }
         loadDirections(position);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
@@ -360,8 +410,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     }
 
     private void loadDirections(final int position) {
-        mSoServiceDirection.getPlacesDirection(String.valueOf(myLocation.getLatitude())
-                        + "," + String.valueOf(myLocation.getLongitude()),
+        mSoServiceDirection.getPlacesDirection(String.valueOf(currentMarker.getPosition().latitude)
+                        + "," + String.valueOf(currentMarker.getPosition().longitude),
                 mListMarkers.get(position).getPosition().latitude
                         + "," + mListMarkers.get(position).getPosition().longitude,
                 "walking",
@@ -374,31 +424,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                             mRoutes.clear();
                             mRoutes.addAll(response.body().getRoutes());
 
-                            // Add Route markers for Direction
-                            ArrayList<Marker> mRouteSteps = new ArrayList<>();
-                            for (int i = 0; i < mRoutes.get(0).getLegs().get(0).getSteps().size(); i++) {
-                                MarkerOptions option = new MarkerOptions();
-                                option.position(new LatLng(mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLat(),
-                                        mRoutes.get(0).getLegs().get(0).getSteps().get(i).getStartLocation().getLng()));
-                                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stargold));
-                                Marker marker = myMap.addMarker(option);
-                                marker.setDraggable(true);
-                                mRouteSteps.add(marker);
-                            }
 
-
-                            // points: overview_polyline
-                            ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
-                            // Draw polylines
-                            PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
-                            for (int i = 0; i < arrDecode.size(); i++) {
-                                polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
-                            }
-                            // Clear old direction
-                            if (mPolyline != null) {
-                                mPolyline.remove();
-                            }
-                            mPolyline = myMap.addPolyline(polyOp);
 
                             // Display distance and duration of Destination
                             if (mRoutes.size() > 0) {
@@ -408,15 +434,12 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                             }
                             Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
                         } else {
-//                            Log.d("MapActivity", "Routes didn't load from API: ");
                             Toast.makeText(MapActivity.this, "Routes didn't load from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-//                        Log.d("", "onFailure: " + call.request().url().toString());
-//                        Log.d("MapActivity", "Load Direc PlaceStop failed from API");
                         Toast.makeText(MapActivity.this, "Load Direction PlaceStop failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                     }
                 });
