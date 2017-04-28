@@ -8,6 +8,8 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -110,24 +112,28 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @Click(R.id.fabFindDirec)
     public void clickFabFindDirec() {
         Log.d("click fab", "clickFabFindDirec: ");
-        if (isViewpagerVisibility) {
-            // points: overview_polyline
-            ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
-            // Draw polylines
-            PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
-            polyOp.add(new LatLng(currentMarker.getPosition().latitude, currentMarker.getPosition().longitude));
-            for (int i = 0; i < arrDecode.size(); i++) {
-                polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+        if (isOnline()) {
+            if (isViewpagerVisibility) {
+                // points: overview_polyline
+                ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
+                // Draw polylines
+                PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+                polyOp.add(new LatLng(currentMarker.getPosition().latitude, currentMarker.getPosition().longitude));
+                for (int i = 0; i < arrDecode.size(); i++) {
+                    polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+                }
+                polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
+                        mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
+                // Clear old direction
+                if (mPolyline != null) {
+                    mPolyline.remove();
+                }
+                mPolyline = myMap.addPolyline(polyOp);
+            } else {
+                Toast.makeText(this, "Please choose your destination!", Toast.LENGTH_SHORT).show();
             }
-            polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
-                    mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
-            // Clear old direction
-            if (mPolyline != null) {
-                mPolyline.remove();
-            }
-            mPolyline = myMap.addPolyline(polyOp);
         } else {
-            Toast.makeText(this, "Please choose your destination!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No internet, please check your network!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -350,9 +356,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     if (previousSelectedMarker != null) {
                         previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
-                    currentMarker.remove();
+                   if (currentMarker != null) {
+                       currentMarker.remove();
+                   }
                     showMyLocation();
-                    mPolyline.remove();
+//                    mPolyline.remove();
                     loadDirections(mViewPager.getCurrentItem());
                     myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     currentMarker.showInfoWindow();
@@ -472,6 +480,12 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             poly.add(position);
         }
         return poly;
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     @Override
