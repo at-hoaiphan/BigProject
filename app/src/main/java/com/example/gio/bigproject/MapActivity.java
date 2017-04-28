@@ -2,6 +2,8 @@ package com.example.gio.bigproject;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -18,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -44,7 +47,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 
@@ -52,7 +59,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
+@OptionsMenu(R.menu.menu_toolbar)
 @EActivity(R.layout.activity_main)
 public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
 
@@ -61,6 +68,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @ViewById(R.id.fabFindDirec)
     FloatingActionButton fabFindDirec;
+
+    @Pref
+    SettingsInterface_ settingsInterface;
 
     private SOServiceDirection mSoServiceDirection;
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
@@ -76,10 +86,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     // Request for location (***).
     // value 8bit (value < 256).
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
+    public static final int SETTINGS = 99;
+    public static final int MAP_TYPE_NORMAL = 1;
+    public static final int MAP_TYPE_SATELLITE = 2;
+    private static int MAP_TYPE = MAP_TYPE_NORMAL;
 
     @AfterViews
     void afterViews() {
-
         // Request data from server
         MockData.createData();
         Log.d("Map", "afterViews: " + MockData.getData().size());
@@ -107,6 +120,36 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Set onPageChange
         mViewPager.setOnPageChangeListener(this);
+    }
+
+    @OptionsItem(R.id.mnSettings)
+    void selectSettingsItem() {
+        SettingsActivity_.intent(this).startForResult(SETTINGS);
+    }
+
+    @OptionsItem(R.id.mnAboutUs)
+    void selectAboutUsItem() {
+
+    }
+
+    @OptionsItem(R.id.mnExit)
+    void selectExitItem() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Message");
+        builder.setMessage("Do you to quite app?")
+                .setCancelable(false)
+                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface,  int id) {
+                        finish();
+                    }
+                })
+                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Click(R.id.fabFindDirec)
@@ -217,7 +260,15 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 askPermissionsAndShowMyLocation();
             }
         });
-        myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        MAP_TYPE = settingsInterface.type().get();
+        if (MAP_TYPE == MAP_TYPE_NORMAL) {
+            myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+        if (MAP_TYPE == MAP_TYPE_SATELLITE){
+            myMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+
         myMap.getUiSettings().setZoomControlsEnabled(true);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -422,12 +473,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         + "," + String.valueOf(currentMarker.getPosition().longitude),
                 mListMarkers.get(position).getPosition().latitude
                         + "," + mListMarkers.get(position).getPosition().longitude,
-                "walking",
+                settingsInterface.mode().get().toLowerCase(),
                 ApiUtilsBus.KEY)
                 .enqueue(new Callback<SOPlacesDirectionResponse>() {
                     @Override
                     public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
 
+                        Log.d("modeCheck", "onResponse: " + settingsInterface.mode().get());
                         if (response.isSuccessful()) {
                             mRoutes.clear();
                             mRoutes.addAll(response.body().getRoutes());
@@ -488,6 +540,16 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    @OnActivityResult(SETTINGS)
+    void startActivityForResult(int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            boolean needReload = data.getBooleanExtra("needReload", true);
+            if (needReload) {
+                finish();
+                MapActivity_.intent(this).start();
+            }
+        }
+    }
     @Override
     public void onLocationChanged(Location location) {
 

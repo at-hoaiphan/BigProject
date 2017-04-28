@@ -26,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ListBusStopActivity_"/>
+        <activity android:name=".SettingsActivity_"/>
         <activity android:name=".SplashActivity"/>
 
         <meta-data
