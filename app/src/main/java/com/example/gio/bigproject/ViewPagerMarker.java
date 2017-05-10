@@ -3,7 +3,6 @@ package com.example.gio.bigproject;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.gio.bigproject.data.BusStopDatabase;
@@ -24,10 +23,6 @@ public class ViewPagerMarker extends Fragment {
     TextView tvMarkerTitle;
     @ViewById(R.id.tvMarkerLongLat)
     TextView tvmarkerLongLat;
-    @ViewById(R.id.tvRating)
-    TextView tvRating;
-    @ViewById(R.id.ratingBar)
-    RatingBar ratingBar;
     @ViewById(R.id.imgLocation)
     ImageView imgLocaton;
     private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
