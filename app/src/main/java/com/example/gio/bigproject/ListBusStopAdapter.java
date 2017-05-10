@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.gio.bigproject.model.bus_stop.Result;
+import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
 import java.util.List;
 
@@ -19,23 +19,32 @@ import java.util.List;
 
 public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
 
-    private List<Result> mItems;
+//    private List<Result> mItems;
+    private List<PlaceStop> mItems;
+    private PlaceListener mPlaceListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvIdStation;
+        TextView tvLatLongStation;
         TextView tvNameStation;
         ImageView imgStation;
 
         ViewHolder(View itemView) {
             super(itemView);
-            tvIdStation = (TextView) itemView.findViewById(R.id.tvIdStation);
+            tvLatLongStation = (TextView) itemView.findViewById(R.id.tvLatLong);
             tvNameStation = (TextView) itemView.findViewById(R.id.tvNameStation);
             imgStation = (ImageView) itemView.findViewById(R.id.imgStation);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mPlaceListener.onPlaceClick(getAdapterPosition());
+                }
+            });
         }
     }
 
-    public ListBusStopAdapter(List<Result> posts) {
+    public ListBusStopAdapter(List<PlaceStop> posts) {
         mItems = posts;
     }
 
@@ -45,39 +54,55 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View postView = inflater.inflate(R.layout.item_owner, parent, false);
+        View postView = inflater.inflate(R.layout.item_place, parent, false);
 
         return new ViewHolder(postView);
     }
 
-    @Override
-    public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
+//    @Override
+//    public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
+//
+//        Result item = mItems.get(position);
+//        TextView tvIdStation = holder.tvLatLongStation;
+//        TextView tvNameStation = holder.tvNameStation;
+//        tvIdStation.setText(String.valueOf(item.getGeometry().getLocation().getLat()) + ";"
+//                + String.valueOf(item.getGeometry().getLocation().getLng()));
+//        tvNameStation.setText(item.getName());
+//
+//        holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
+//    }
+@Override
+public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
 
-        Result item = mItems.get(position);
-        TextView tvIdStation = holder.tvIdStation;
-        TextView tvNameStation = holder.tvNameStation;
-        tvIdStation.setText(String.valueOf(item.getGeometry().getLocation().getLat()) + ";"
-                + String.valueOf(item.getGeometry().getLocation().getLng()));
-        tvNameStation.setText(item.getName());
+    PlaceStop item = mItems.get(position);
+    TextView tvLatLongStation = holder.tvLatLongStation;
+    TextView tvNameStation = holder.tvNameStation;
+    tvLatLongStation.setText(String.valueOf(item.getLatitude()) + ";"
+            + String.valueOf(item.getLongitude()));
+    tvNameStation.setText(item.getName());
 
-        holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
-    }
+    holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
+}
 
     @Override
     public int getItemCount() {
         return mItems.size();
     }
 
-    public void updateAnswers(List<Result> items) {
+    public void updateAnswers(List<PlaceStop> items) {
         mItems = items;
         notifyDataSetChanged();
     }
 
-    private Result getItem(int adapterPosition) {
+    private PlaceStop getItem(int adapterPosition) {
         return mItems.get(adapterPosition);
     }
 
-    public interface PostItemListener {
-        void onPostClick(long id);
+    public interface PlaceListener {
+        void onPlaceClick(int id);
+    }
+
+    public void setPlaceOnClickListener(PlaceListener mPlaceListener) {
+        this.mPlaceListener = mPlaceListener;
     }
 }

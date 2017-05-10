@@ -2,6 +2,8 @@ package com.example.gio.bigproject;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -18,9 +20,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.data.ApiUtilsBus;
@@ -44,7 +49,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
+import org.androidannotations.annotations.OptionsItem;
+import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
 
@@ -52,7 +61,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
+@OptionsMenu(R.menu.menu_toolbar)
 @EActivity(R.layout.activity_main)
 public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
 
@@ -61,6 +70,15 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @ViewById(R.id.fabFindDirec)
     FloatingActionButton fabFindDirec;
+
+    @ViewById(R.id.fabListBusStops)
+    FloatingActionButton fabListBusStops;
+
+    @ViewById(R.id.spBusCarriage)
+    Spinner spinnerBusCarriage;
+
+    @Pref
+    SettingsInterface_ settingsInterface;
 
     private SOServiceDirection mSoServiceDirection;
     private ArrayList<Marker> mListMarkers = new ArrayList<>();
@@ -76,10 +94,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     // Request for location (***).
     // value 8bit (value < 256).
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
+    public static final int SETTINGS = 99;
+    public static final int LIST_PLACES = 88;
+    public static final int MAP_TYPE_NORMAL = 1;
+    public static final int MAP_TYPE_SATELLITE = 2;
 
     @AfterViews
     void afterViews() {
-
         // Request data from server
         MockData.createData();
         Log.d("Map", "afterViews: " + MockData.getData().size());
@@ -109,37 +130,77 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mViewPager.setOnPageChangeListener(this);
     }
 
+    @OptionsItem(R.id.mnSettings)
+    void selectSettingsItem() {
+        SettingsActivity_.intent(this).startForResult(SETTINGS);
+    }
+
+    @OptionsItem(R.id.mnAboutUs)
+    void selectAboutUsItem() {
+
+    }
+
+    @OptionsItem(R.id.mnExit)
+    void selectExitItem() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Message");
+        builder.setMessage("Do you to quite app?")
+                .setCancelable(false)
+                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int id) {
+                        finish();
+                    }
+                })
+                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     @Click(R.id.fabFindDirec)
-    public void clickFabFindDirec() {
+    void clickFabFindDirec() {
         Log.d("click fab", "clickFabFindDirec: ");
-        if (isOnline()) {
-            if (isViewpagerVisibility) {
-                // points: overview_polyline
-                ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
-                // Draw polylines
-                PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
-                polyOp.add(new LatLng(currentMarker.getPosition().latitude, currentMarker.getPosition().longitude));
-                for (int i = 0; i < arrDecode.size(); i++) {
-                    polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+        try {
+            if (isOnline()) {
+                if (isViewpagerVisibility) {
+                    // points: overview_polyline
+                    ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
+                    // Draw polylines
+                    PolylineOptions polyOp = new PolylineOptions().geodesic(true).color(Color.BLUE).width(10);
+                    polyOp.add(new LatLng(currentMarker.getPosition().latitude, currentMarker.getPosition().longitude));
+                    for (int i = 0; i < arrDecode.size(); i++) {
+                        polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+                    }
+                    polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
+                            mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
+                    // Clear old direction
+                    if (mPolyline != null) {
+                        mPolyline.remove();
+                    }
+                    mPolyline = myMap.addPolyline(polyOp);
+                } else {
+                    Toast.makeText(this, "Please choose your destination!", Toast.LENGTH_SHORT).show();
                 }
-                polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
-                        mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
-                // Clear old direction
-                if (mPolyline != null) {
-                    mPolyline.remove();
-                }
-                mPolyline = myMap.addPolyline(polyOp);
             } else {
-                Toast.makeText(this, "Please choose your destination!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No internet, please check your network!", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(this, "No internet, please check your network!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Click(R.id.fabListBusStops)
+    void clickListButton() {
+        ListBusStopActivity_.intent(this).startForResult(LIST_PLACES);
     }
 
     private void onMyMapReady(GoogleMap googleMap) {
         // Get GoogleMap object:
         myMap = googleMap;
+
 
         // Map loaded
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -177,22 +238,53 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 //                    Toast.makeText(getBaseContext(), "Load API failed, Please restart app again!", Toast.LENGTH_SHORT).show();
 //                }
 
-                if (mBusStopDatabase.getAllPlaces().size() > 0) {
-                    for (int i = 0; i < mBusStopDatabase.getAllPlaces().size(); i++) {
-                        MarkerOptions option = new MarkerOptions();
-                        option.title(mBusStopDatabase.getAllPlaces().get(i).getName());
-                        option.snippet(mBusStopDatabase.getAllPlaces().get(i).getLatitude()
-                                + ";" + mBusStopDatabase.getAllPlaces().get(i).getLongitude());
-                        option.position(new LatLng(mBusStopDatabase.getAllPlaces().get(i).getLatitude(),
-                                mBusStopDatabase.getAllPlaces().get(i).getLongitude()));
-                        option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-                        Marker marker = myMap.addMarker(option);
-                        mListMarkers.add(marker);
+//                if (mBusStopDatabase.getAllPlaces().size() > 0) {
+//                    for (int i = 0; i < mBusStopDatabase.getAllPlaces().size(); i++) {
+//                        MarkerOptions option = new MarkerOptions();
+//                        option.title(mBusStopDatabase.getAllPlaces().get(i).getName());
+//                        option.snippet(mBusStopDatabase.getAllPlaces().get(i).getLatitude()
+//                                + ";" + mBusStopDatabase.getAllPlaces().get(i).getLongitude());
+//                        option.position(new LatLng(mBusStopDatabase.getAllPlaces().get(i).getLatitude(),
+//                                mBusStopDatabase.getAllPlaces().get(i).getLongitude()));
+//                        option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+//                        Marker marker = myMap.addMarker(option);
+//                        mListMarkers.add(marker);
+//                    }
+//
+//                } else {
+//                    Toast.makeText(getBaseContext(), "Load data failed!", Toast.LENGTH_SHORT).show();
+//                }
+
+                spinnerBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        myMap.clear();
+                        mListMarkers.clear();
+
+                        showMyLocation();
+                        String positionCarriage = String.valueOf(spinnerBusCarriage.getSelectedItemPosition() + 1);
+                        if (mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).size() > 0) {
+                            for (int j = 0; j < mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).size(); j++) {
+                                MarkerOptions option = new MarkerOptions();
+                                option.title(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).get(j).getName());
+                                option.snippet(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).get(j).getLatitude()
+                                        + ";" + mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).get(j).getLongitude());
+                                option.position(new LatLng(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).get(j).getLatitude(),
+                                        mBusStopDatabase.getPlacesByIdCarriage(positionCarriage).get(j).getLongitude()));
+                                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+                                Marker marker = myMap.addMarker(option);
+                                mListMarkers.add(marker);
+                            }
+
+                        }
                     }
 
-                } else {
-                    Toast.makeText(getBaseContext(), "Load data failed!", Toast.LENGTH_SHORT).show();
-                }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
 
                 myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
@@ -203,11 +295,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                             if (marker.equals(mListMarkers.get(i))) {
                                 mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
                                 mViewPager.setCurrentItem(i, true);
-                                if (previousSelectedMarker != null) {
-                                    previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-                                }
-                                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
-                                previousSelectedMarker = marker;
                             }
                         }
                         return false;
@@ -217,7 +304,15 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 askPermissionsAndShowMyLocation();
             }
         });
-        myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        int MAP_TYPE = settingsInterface.type().get();
+        if (MAP_TYPE == MAP_TYPE_NORMAL) {
+            myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+        if (MAP_TYPE == MAP_TYPE_SATELLITE) {
+            myMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+
         myMap.getUiSettings().setZoomControlsEnabled(true);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -356,9 +451,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     if (previousSelectedMarker != null) {
                         previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                     }
-                   if (currentMarker != null) {
-                       currentMarker.remove();
-                   }
+                    if (currentMarker != null) {
+                        currentMarker.remove();
+                    }
                     showMyLocation();
 //                    mPolyline.remove();
                     loadDirections(mViewPager.getCurrentItem());
@@ -418,39 +513,43 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     }
 
     private void loadDirections(final int position) {
-        mSoServiceDirection.getPlacesDirection(String.valueOf(currentMarker.getPosition().latitude)
-                        + "," + String.valueOf(currentMarker.getPosition().longitude),
-                mListMarkers.get(position).getPosition().latitude
-                        + "," + mListMarkers.get(position).getPosition().longitude,
-                "walking",
-                ApiUtilsBus.KEY)
-                .enqueue(new Callback<SOPlacesDirectionResponse>() {
-                    @Override
-                    public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+        try {
+            mSoServiceDirection.getPlacesDirection(String.valueOf(currentMarker.getPosition().latitude)
+                            + "," + String.valueOf(currentMarker.getPosition().longitude),
+                    mListMarkers.get(position).getPosition().latitude
+                            + "," + mListMarkers.get(position).getPosition().longitude,
+                    settingsInterface.mode().get().toLowerCase(),
+                    ApiUtilsBus.KEY)
+                    .enqueue(new Callback<SOPlacesDirectionResponse>() {
+                        @Override
+                        public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
 
-                        if (response.isSuccessful()) {
-                            mRoutes.clear();
-                            mRoutes.addAll(response.body().getRoutes());
+                            Log.d("modeCheck", "onResponse: " + settingsInterface.mode().get());
+                            if (response.isSuccessful()) {
+                                mRoutes.clear();
+                                mRoutes.addAll(response.body().getRoutes());
 
 
-
-                            // Display distance and duration of Destination
-                            if (mRoutes.size() > 0) {
-                                mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-                                        + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
-                                mListMarkers.get(position).showInfoWindow();
+                                // Display distance and duration of Destination
+                                if (mRoutes.size() > 0) {
+                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+                                    mListMarkers.get(position).showInfoWindow();
+                                }
+                                Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
+                            } else {
+                                Toast.makeText(MapActivity.this, "Routes didn't load from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                             }
-                            Log.d("MapActivity", "Routes loaded from API placeDirec Steps = " + mRoutes.get(0).getLegs().get(0).getSteps().size());
-                        } else {
-                            Toast.makeText(MapActivity.this, "Routes didn't load from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-                        Toast.makeText(MapActivity.this, "Load Direction PlaceStop failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+                            Toast.makeText(MapActivity.this, "Load Direction PlaceStop failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (Exception e) {
+            Toast.makeText(this, "Request directions from Google error!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private ArrayList<LatLng> decodePoly(String encoded) {
@@ -486,6 +585,29 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    @OnActivityResult(SETTINGS)
+    void startActivityForResult(int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            boolean needReload = data.getBooleanExtra("needReload", true);
+            if (needReload) {
+                finish();
+                MapActivity_.intent(this).start();
+            }
+        }
+    }
+
+    @OnActivityResult(LIST_PLACES)
+    void startActivityForResultList(int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            int idPlace = data.getIntExtra("idPlace", -1);
+            if (idPlace != -1) {
+                mViewPager.setVisibility(View.VISIBLE);
+                isViewpagerVisibility = true;
+                mViewPager.setCurrentItem(idPlace, true);
+            }
+        }
     }
 
     @Override

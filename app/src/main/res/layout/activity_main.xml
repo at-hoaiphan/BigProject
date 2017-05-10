@@ -19,14 +19,36 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabFindDirec"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:clickable="true"
+        android:src="@drawable/ic_findway"
+        app:fabSize="normal"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabListBusStops"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:clickable="true"
-        android:src="@drawable/ic_findway2"
+        android:src="@drawable/ic_list"
+        app:fabSize="mini"
         android:layout_marginEnd="70dp"
         android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
+
+    <Spinner
+        android:id="@+id/spBusCarriage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="10dp"
+        android:background="#88ffffff"
+        android:entries="@array/carriages_array"
+        android:prompt="@string/list_bus_carriage"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_location"
