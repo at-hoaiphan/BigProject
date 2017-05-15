@@ -114,10 +114,10 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         return listPlaces;
     }
 
-    public int getCountPlaces() {
+    public int getCountPlaces(String idCarriage) {
         SQLiteDatabase mSqLiteDatabase = getWritableDatabase();
         ArrayList<PlaceStop> listPlaces = new ArrayList<>();
-        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES, null);
+        Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES + " where idCarriage like '%" + idCarriage + "%'", null);
         return cursor.getCount();
     }
 

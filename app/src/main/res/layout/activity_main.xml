@@ -14,15 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
-        </fragment>
+        android:layout_alignParentStart="true"/>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabFindDirec"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:clickable="true"
-        android:src="@drawable/ic_findway"
+        android:src="@drawable/ic_directions"
         app:fabSize="normal"
         android:layout_marginTop="5dp"
         android:layout_centerHorizontal="true"
@@ -40,13 +40,14 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
-    <Spinner
+    <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/spBusCarriage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="10dp"
-        android:background="#88ffffff"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/ic_directions_bus"
+        android:popupBackground="#73378eff"
+        android:layout_margin="15dp"
+        android:layout_below="@+id/fabListBusStops"
         android:entries="@array/carriages_array"
         android:prompt="@string/list_bus_carriage"/>
 

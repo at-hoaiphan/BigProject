@@ -4,10 +4,17 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/spBusCarriage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/carriages_name_array" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_places"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spBusCarriage"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabBack"

@@ -5,11 +5,14 @@ import android.support.v4.app.Fragment;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.gio.bigproject.data.BusStopDatabase;
+import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+
+import java.util.Objects;
 
 /**
  * Copyright by Gio.
@@ -25,6 +28,9 @@ public class ViewPagerMarker extends Fragment {
     TextView tvmarkerLongLat;
     @ViewById(R.id.imgLocation)
     ImageView imgLocaton;
+
+    @Pref
+    SettingsInterface_ settingsInterface;
     private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
 
     public ViewPagerMarker() {
@@ -32,21 +38,38 @@ public class ViewPagerMarker extends Fragment {
 
     @AfterViews
     void afterViews() {
-        int position = 0;
-
-        if (getArguments() != null) {
-            position = getArguments().getInt("positionFrag");
+        PlaceStop placeStop = getArguments().getParcelable("object");
+        if (placeStop != null) {
+            tvMarkerTitle.setText(placeStop.getName());
+            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + placeStop.getLatitude())
+                    + "; " + String.valueOf(placeStop.getLongitude()));
         }
+        if (Objects.equals(settingsInterface.mode().get().toLowerCase(), "walking")) {
+            imgLocaton.setImageResource(R.drawable.ic_walking);
+        } else {
+            imgLocaton.setImageResource(R.drawable.ic_car);
+        }
+    }
 
-        // Load data from server
+    public ViewPagerMarker newInstance(PlaceStop placeStop) {
+        ViewPagerMarker fragment = new ViewPagerMarker_();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("object", placeStop);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    // Load data from server
 //        ArrayList<Result> mResults = MockData.getData();
 
         // Load data from local database
-        BusStopDatabase mBusStopDatabase = new BusStopDatabase(getContext());
-        if (mBusStopDatabase.getAllPlaces().size() > 0) {
-            tvMarkerTitle.setText(mBusStopDatabase.getAllPlaces().get(position).getName());
-            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mBusStopDatabase.getAllPlaces().get(position).getLatitude())
-                    + "; " + String.valueOf(mBusStopDatabase.getAllPlaces().get(position).getLongitude()));
+//        BusStopDatabase mBusStopDatabase = new BusStopDatabase(getContext());
+//        ArrayList<PlaceStop> mPlacePagers = mBusStopDatabase.getPlacesByIdCarriage(MapActivity.positionCarriage);
+//        Log.d("ViewPagerMarker", "afterViews: " + mPlacePagers.size());
+//        if (mPlacePagers.size() > 0) {
+//            tvMarkerTitle.setText(mPlacePagers.get(position).getName());
+//            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + mPlacePagers.get(position).getLatitude())
+//                    + "; " + String.valueOf(mPlacePagers.get(position).getLongitude()));
 //            try {
 //                String string = mResults.get(position).getPhotos().get(0).getPhotoReference();
 //                Picasso.with(this.getContext())
@@ -63,16 +86,7 @@ public class ViewPagerMarker extends Fragment {
 //                tvRating.setText("Rating: Non");
 //                ratingBar.setRating(0f);
 //            }
-        }
-    }
-
-    public ViewPagerMarker getPosition(int position) {
-        ViewPagerMarker fragment = new ViewPagerMarker_();
-        Bundle bundle = new Bundle();
-        bundle.putInt("positionFrag", position);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
+//        }
 
 //    @Nullable
 //    @Override

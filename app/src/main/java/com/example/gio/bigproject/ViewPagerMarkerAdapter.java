@@ -4,8 +4,11 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
-import com.example.gio.bigproject.data.BusStopDatabase;
+import com.example.gio.bigproject.model.bus_stop.PlaceStop;
+
+import java.util.ArrayList;
 
 /**
  * Copyright by Gio.
@@ -13,22 +16,23 @@ import com.example.gio.bigproject.data.BusStopDatabase;
  */
 
 class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
-    private int count;
+    private ArrayList<PlaceStop> mPlaceStops;
     private Context context;
 
-    public ViewPagerMarkerAdapter(Context context, FragmentManager fm) {
+    public ViewPagerMarkerAdapter(Context context, FragmentManager fm, ArrayList<PlaceStop> placeStops) {
         super(fm);
         this.context = context;
-        count = new BusStopDatabase(context).getCountPlaces();
+        this.mPlaceStops = placeStops;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return new ViewPagerMarker().getPosition(position);
+        Log.d("TAG", "getItem: " + mPlaceStops.get(position));
+        return new ViewPagerMarker().newInstance(mPlaceStops.get(position));
     }
 
     @Override
-    public int getCount() { return count;
+    public int getCount() { return mPlaceStops.size();
     }
 
     @Override
@@ -37,7 +41,9 @@ class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
         return String.valueOf(position);
     }
 
+    @Override
     public int getItemPosition(Object object) {
+        Log.d("ViewPager check ", "getItemPosition: " + mPlaceStops.size());
         return POSITION_NONE;
     }
 }
