@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,9 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import com.example.gio.bigproject.R;
+import com.example.gio.bigproject.SettingsInterface_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;

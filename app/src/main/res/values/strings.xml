@@ -21,6 +21,15 @@
     <string name="cancel">Cancel</string>
 
     <string name="list_bus_carriage">Choose a carriage</string>
+    <string name="find_busstop">Find BusStop</string>
+    <string name="copyright_by">Copyright:</string>
+    <string name="telephone">Telephone:</string>
+    <string name="email">Email:</string>
+    <string name="phan_van_hoai">Phan Van Hoai</string>
+    <string name="tel">0985 936 754</string>
+    <string name="my_email">phanvanhoaivh4394@gmail.com</string>
+    <string name="dut">Danang University of Technology</string>
+    <string name="address">Address</string>
 
     <string-array name="carriages_array">
         <item>Tuyến 1</item>

@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -10,8 +10,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import com.example.gio.bigproject.R;
+import com.example.gio.bigproject.adapter.ListBusStopAdapter;
 import com.example.gio.bigproject.data.BusStopDatabase;
-import com.example.gio.bigproject.data.SOServiceBus;
 import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
 import org.androidannotations.annotations.AfterViews;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
  * Copyright by Gio.
  * Created on 4/5/2017.
  */
+
 @EActivity(R.layout.activity_list_places)
 public class ListBusStopActivity extends AppCompatActivity implements View.OnClickListener {
     @ViewById(R.id.rv_places)
@@ -37,16 +39,15 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
     Spinner spBusCarriage;
 
     private ListBusStopAdapter mAdapter;
-    private SOServiceBus mService;
+    //    private SOServiceBus mService;
     private BusStopDatabase busStopDatabase;
     private ArrayList<PlaceStop> mPlaceStops;
-    private static String carriage = "1";
 
 //    private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
-        carriage = getIntent().getStringExtra("Carriage");
+        String carriage = getIntent().getStringExtra("Carriage");
         if (carriage != null) {
             spBusCarriage.setSelection(Integer.parseInt(carriage) - 1);
         }

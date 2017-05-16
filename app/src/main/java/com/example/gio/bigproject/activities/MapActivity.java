@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.activities;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -27,8 +27,12 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.gio.bigproject.R;
+import com.example.gio.bigproject.SettingsInterface_;
+import com.example.gio.bigproject.adapter.ViewPagerMarkerAdapter;
 import com.example.gio.bigproject.data.ApiUtilsBus;
 import com.example.gio.bigproject.data.BusStopDatabase;
+import com.example.gio.bigproject.data.CarriagePolyline;
 import com.example.gio.bigproject.data.SOServiceDirection;
 import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 import com.example.gio.bigproject.model.direction.RouteDirec;
@@ -87,6 +91,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private ProgressDialog myProgress;
     private Marker previousSelectedMarker;
     private Polyline mPolyline;
+    private Polyline mCarriagePolyline;
     private BusStopDatabase mBusStopDatabase;
     private Marker currentMarker;
     private ViewPagerMarkerAdapter mAdapter;
@@ -141,14 +146,14 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @OptionsItem(R.id.mnAboutUs)
     void selectAboutUsItem() {
-
+        AboutUs_.intent(this).startForResult(SETTINGS);
     }
 
     @OptionsItem(R.id.mnExit)
     void selectExitItem() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Message");
-        builder.setMessage("Do you to quite app?")
+        builder.setMessage("Do you want to quit app?")
                 .setCancelable(false)
                 .setNegativeButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogInterface, int id) {
@@ -171,6 +176,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 if (isViewpagerVisibility) {
                     // points: overview_polyline
                     ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
+                    Log.d("direc", "clickFabFindDirec: " + mRoutes.get(0).getOverViewPolyline().getPoints());
                     // Draw polylines
                     PolylineOptions polyOp = new PolylineOptions().geodesic(true).width(10);
                     if (Objects.equals(settingsInterface.mode().get().toLowerCase(), "walking")) {
@@ -215,7 +221,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-
                 mViewPager.setVisibility(View.GONE);
                 isViewpagerVisibility = false;
 
@@ -249,7 +254,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 mBusStopDatabase = new BusStopDatabase(getBaseContext());
                 mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(String.valueOf(spinnerBusCarriage.getSelectedItemPosition() + 1)));
                 mAdapter = new ViewPagerMarkerAdapter(getBaseContext(), getSupportFragmentManager(), mPlaceStops);
-                Log.d("MapActivity check", "onMyMapReady: " + mPlaceStops.size());
                 mViewPager.setAdapter(mAdapter);
 
                 if (mBusStopDatabase.getPlacesByIdCarriage(String.valueOf(spinnerBusCarriage.getSelectedItemPosition() + 1)).size() > 0) {
@@ -279,7 +283,31 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         positionCarriage = String.valueOf(i + 1); // Bus Carriage 1-2-3
                         // Reload map
                         myMap.clear();
-                        previousSelectedMarker.remove();
+
+                        // draw carriage 1
+                        if (Objects.equals(positionCarriage, "1")) {
+                            // points: overview_polyline
+                            ArrayList<LatLng> arrCarriageDecode = CarriagePolyline.getCarriagePoly1();
+                            // Draw polylines
+                            PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(15);
+
+                            Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
+                            for (int k = 0; k < arrCarriageDecode.size(); k++) {
+                                carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
+                            }
+
+                            // Clear old direction
+                            if (mCarriagePolyline != null) {
+                                mCarriagePolyline.remove();
+                            }
+                            mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
+                        }
+
+                        // Remove previousSelectedMarker
+                        if (previousSelectedMarker != null) {
+                            previousSelectedMarker.remove();
+                        }
+
                         showMyLocation();
                         mListMarkers.clear();
                         mPlaceStops.clear();
@@ -316,7 +344,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         isViewpagerVisibility = true;
                         if (previousSelectedMarker != null) {
                             try {
-                            previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
+                                previousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                             } catch (Exception ignored) {
 
                             }
@@ -625,9 +653,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             shift = 0;
             result = 0;
             do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
+                try {
+                    b = encoded.charAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } catch (Exception ignored) {
+
+                }
             } while (b >= 0x20);
             int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
             lng += dlng;

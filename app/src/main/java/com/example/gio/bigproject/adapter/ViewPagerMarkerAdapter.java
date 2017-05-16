@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.adapter;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
+import com.example.gio.bigproject.ViewPagerMarker;
 import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
  * Created on 4/14/2017.
  */
 
-class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
+public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
     private ArrayList<PlaceStop> mPlaceStops;
     private Context context;
 
