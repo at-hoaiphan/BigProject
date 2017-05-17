@@ -137,6 +137,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Set onPageChange
         mViewPager.setOnPageChangeListener(this);
+        mViewPager.setPageMargin(10);
+        mViewPager.setAlpha(0.8f);
     }
 
     @OptionsItem(R.id.mnSettings)
@@ -249,7 +251,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 //                    Toast.makeText(getBaseContext(), "Load API failed, Please restart app again!", Toast.LENGTH_SHORT).show();
 //                }
 
-                spinnerBusCarriage.setSelected(false);
                 // Get data from database
                 mBusStopDatabase = new BusStopDatabase(getBaseContext());
                 mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(String.valueOf(spinnerBusCarriage.getSelectedItemPosition() + 1)));

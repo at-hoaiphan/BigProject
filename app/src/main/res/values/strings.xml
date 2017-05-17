@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BigProject</string>
+    <string name="app_name">Find BusStop</string>
     <string name="loading_screen">loading_screen</string>
     <string name="rating">Rating: 0.0</string>
     <string name="lat_long">Lat-Long:</string>
