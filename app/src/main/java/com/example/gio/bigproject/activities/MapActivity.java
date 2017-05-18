@@ -275,6 +275,26 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 } else {
                     Toast.makeText(getBaseContext(), "Load data failed!", Toast.LENGTH_SHORT).show();
                 }
+
+                // draw default carriage 1
+                if (Objects.equals(positionCarriage, "1")) {
+                    // points: overview_polyline
+                    ArrayList<LatLng> arrCarriageDecode = CarriagePolyline.getCarriagePoly1();
+                    // Draw polylines
+                    PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(15);
+
+                    Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
+                    for (int k = 0; k < arrCarriageDecode.size(); k++) {
+                        carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
+                    }
+
+                    // Clear old direction
+                    if (mCarriagePolyline != null) {
+                        mCarriagePolyline.remove();
+                    }
+                    mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
+                }
+
                 spinnerBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -285,24 +305,33 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         // Reload map
                         myMap.clear();
 
-                        // draw carriage 1
-                        if (Objects.equals(positionCarriage, "1")) {
-                            // points: overview_polyline
-                            ArrayList<LatLng> arrCarriageDecode = CarriagePolyline.getCarriagePoly1();
-                            // Draw polylines
-                            PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(15);
-
-                            Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
-                            for (int k = 0; k < arrCarriageDecode.size(); k++) {
-                                carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
-                            }
-
-                            // Clear old direction
-                            if (mCarriagePolyline != null) {
-                                mCarriagePolyline.remove();
-                            }
-                            mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
+                        // draw carriage
+                        // points: overview_polyline
+                        ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
+                        switch (positionCarriage) {
+                            case "1":
+                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly1());
+                                break;
+                            case "2":
+                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly2());
+                                break;
+                            case "3":
+                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly3());
+                                break;
                         }
+                        // Draw polylines
+                        PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(25);
+
+                        Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
+                        for (int k = 0; k < arrCarriageDecode.size(); k++) {
+                            carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
+                        }
+
+                        // Clear old direction
+                        if (mCarriagePolyline != null) {
+                            mCarriagePolyline.remove();
+                        }
+                        mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
 
                         // Remove previousSelectedMarker
                         if (previousSelectedMarker != null) {
