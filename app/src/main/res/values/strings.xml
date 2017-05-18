@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BigProject</string>
+    <string name="app_name">Find BusStop</string>
     <string name="loading_screen">loading_screen</string>
     <string name="rating">Rating: 0.0</string>
     <string name="lat_long">Lat-Long:</string>
@@ -21,10 +21,25 @@
     <string name="cancel">Cancel</string>
 
     <string name="list_bus_carriage">Choose a carriage</string>
+    <string name="find_busstop">Find BusStop</string>
+    <string name="copyright_by">Copyright:</string>
+    <string name="telephone">Telephone:</string>
+    <string name="email">Email:</string>
+    <string name="phan_van_hoai">Phan Van Hoai</string>
+    <string name="tel">0985 936 754</string>
+    <string name="my_email">phanvanhoaivh4394@gmail.com</string>
+    <string name="dut">Danang University of Technology</string>
+    <string name="address">Address</string>
 
     <string-array name="carriages_array">
         <item>Tuyến 1</item>
         <item>Tuyến 2</item>
         <item>Tuyến 3</item>
+    </string-array>
+
+    <string-array name="carriages_name_array">
+        <item>Tuyến 1: Bx Trung tâm Đà Nẵng - Bx Hội An</item>
+        <item>Tuyến 2: Kim Liên - Chợ Hàn</item>
+        <item>Tuyến 3: Bx Trung tâm Đà Nẵng - Bx Ái Nghĩa</item>
     </string-array>
 </resources>

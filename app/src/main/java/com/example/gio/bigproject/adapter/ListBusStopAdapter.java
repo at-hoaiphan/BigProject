@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.gio.bigproject.R;
 import com.example.gio.bigproject.model.bus_stop.PlaceStop;
 
 import java.util.List;
@@ -89,14 +90,14 @@ public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position)
         return mItems.size();
     }
 
-    public void updateAnswers(List<PlaceStop> items) {
-        mItems = items;
-        notifyDataSetChanged();
-    }
+//    public void updateAnswers(List<PlaceStop> items) {
+//        mItems = items;
+//        notifyDataSetChanged();
+//    }
 
-    private PlaceStop getItem(int adapterPosition) {
-        return mItems.get(adapterPosition);
-    }
+//    private PlaceStop getItem(int adapterPosition) {
+//        return mItems.get(adapterPosition);
+//    }
 
     public interface PlaceListener {
         void onPlaceClick(int id);

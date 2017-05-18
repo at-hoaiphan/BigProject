@@ -1,9 +1,11 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.example.gio.bigproject.R;
 
 /**
  * Copyright by Gio.

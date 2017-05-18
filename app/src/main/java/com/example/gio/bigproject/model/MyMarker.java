@@ -1,4 +1,4 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.model;
 
 /**
  * Copyright by Gio.
