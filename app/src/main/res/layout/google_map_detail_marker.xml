@@ -10,7 +10,7 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_margin="10dp"
-        android:src="@drawable/img_splash" />
+        android:src="@drawable/img_bus_rinning" />
 
     <TextView
         android:id="@+id/tvMarkerTitle"
@@ -22,10 +22,11 @@
         android:textColor="#000000"/>
 
     <TextView
-        android:id="@+id/tvMarkerLongLat"
+        android:id="@+id/tvMarkerAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/lat_long"
+        android:text="@string/address_"
+        android:textSize="12sp"
         android:textColor="#ffffff"
         android:layout_alignStart="@+id/tvMarkerTitle"
         android:layout_below="@+id/tvMarkerTitle"/>

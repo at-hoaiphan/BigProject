@@ -306,32 +306,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         myMap.clear();
 
                         // draw carriage
-                        // points: overview_polyline
-                        ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
-                        switch (positionCarriage) {
-                            case "1":
-                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly1());
-                                break;
-                            case "2":
-                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly2());
-                                break;
-                            case "3":
-                                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly3());
-                                break;
-                        }
-                        // Draw polylines
-                        PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(25);
-
-                        Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
-                        for (int k = 0; k < arrCarriageDecode.size(); k++) {
-                            carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
-                        }
-
-                        // Clear old direction
-                        if (mCarriagePolyline != null) {
-                            mCarriagePolyline.remove();
-                        }
-                        mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
+                        drawCarriagePoly(positionCarriage);
 
                         // Remove previousSelectedMarker
                         if (previousSelectedMarker != null) {
@@ -644,7 +619,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     private void loadMap() {
         myMap.clear();
-        previousSelectedMarker.remove();
+        if (previousSelectedMarker != null) {
+            previousSelectedMarker.remove();
+        }
         showMyLocation();
         mListMarkers.clear();
         mPlaceStops.clear();
@@ -665,6 +642,35 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mViewPager.setAdapter(null);
         mAdapter = new ViewPagerMarkerAdapter(getBaseContext(), getSupportFragmentManager(), mPlaceStops);
         mViewPager.setAdapter(mAdapter);
+    }
+
+    private void drawCarriagePoly(String carriage) {
+        // points: overview_polyline
+        ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
+        switch (positionCarriage) {
+            case "1":
+                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly1());
+                break;
+            case "2":
+                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly2());
+                break;
+            case "3":
+                arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly3());
+                break;
+        }
+        // Draw polylines
+        PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).color(Color.RED).width(25);
+
+        Log.d("TAGsize", "afterViews: " + arrCarriageDecode.size());
+        for (int k = 0; k < arrCarriageDecode.size(); k++) {
+            carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
+        }
+
+        // Clear old direction
+        if (mCarriagePolyline != null) {
+            mCarriagePolyline.remove();
+        }
+        mCarriagePolyline = myMap.addPolyline(carriagePolyOption);
     }
 
     private ArrayList<LatLng> decodePoly(String encoded) {
@@ -723,6 +729,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             if (!Objects.equals(positionCarriage, data.getStringExtra("idCarriage"))) {
                 positionCarriage = data.getStringExtra("idCarriage");
                 loadMap();
+                drawCarriagePoly(positionCarriage);
             }
             int idPlace = data.getIntExtra("idPlace", -1);
             if (idPlace != -1) {

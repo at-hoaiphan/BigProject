@@ -30,6 +30,7 @@
     <string name="my_email">phanvanhoaivh4394@gmail.com</string>
     <string name="dut">Danang University of Technology</string>
     <string name="address">Address</string>
+    <string name="address_">Address:</string>
 
     <string-array name="carriages_array">
         <item>Tuyến 1</item>
