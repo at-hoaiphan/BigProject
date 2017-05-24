@@ -6,15 +6,9 @@
     android:orientation="vertical">
 
     <pl.droidsonroids.gif.GifTextView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/img_running" />
+        android:background="@drawable/img_bus_rinning" />
 
-    <ProgressBar
-        android:scrollbarStyle="insideOverlay"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
 </RelativeLayout>

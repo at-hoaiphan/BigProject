@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MapActivity_"
+        <activity android:name=".activities.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
         </activity>
         <activity android:name=".activities.ListBusStopActivity_"/>
         <activity android:name=".activities.SettingsActivity_"/>
-        <activity android:name=".activities.SplashActivity"/>
+        <activity android:name=".activities.MapActivity_"/>
         <activity android:name=".activities.AboutUs_"/>
 
         <meta-data

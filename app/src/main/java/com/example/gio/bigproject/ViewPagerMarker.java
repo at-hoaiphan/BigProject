@@ -24,8 +24,8 @@ public class ViewPagerMarker extends Fragment {
 
     @ViewById(R.id.tvMarkerTitle)
     TextView tvMarkerTitle;
-    @ViewById(R.id.tvMarkerLongLat)
-    TextView tvmarkerLongLat;
+    @ViewById(R.id.tvMarkerAddress)
+    TextView tvMarkerAddress;
     @ViewById(R.id.imgLocation)
     ImageView imgLocaton;
 
@@ -41,8 +41,7 @@ public class ViewPagerMarker extends Fragment {
         PlaceStop placeStop = getArguments().getParcelable("object");
         if (placeStop != null) {
             tvMarkerTitle.setText(placeStop.getName());
-            tvmarkerLongLat.setText(String.valueOf("Lat-Long: " + placeStop.getLatitude())
-                    + "; " + String.valueOf(placeStop.getLongitude()));
+            tvMarkerAddress.setText(String.valueOf("Address: " + placeStop.getAddress()));
         }
         if (Objects.equals(settingsInterface.mode().get().toLowerCase(), "walking")) {
             imgLocaton.setImageResource(R.drawable.ic_walking);

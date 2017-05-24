@@ -24,7 +24,7 @@ public class SplashActivity extends AppCompatActivity{
             public void run() {
                 try {
                     super.run();
-                    sleep(2000);  //Delay of 10 seconds
+                    sleep(3000);  //Delay of 10 seconds
                 } catch (Exception e) {
                     Log.d("Error Splash Screen", "run: ");
                 } finally {
