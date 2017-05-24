@@ -33,12 +33,14 @@
     <string name="address_">Address:</string>
 
     <string-array name="carriages_array">
+        <item>Tất cả</item>
         <item>Tuyến 1</item>
         <item>Tuyến 2</item>
         <item>Tuyến 3</item>
     </string-array>
 
     <string-array name="carriages_name_array">
+        <item>Tất cả các tuyến xe</item>
         <item>Tuyến 1: Bx Trung tâm Đà Nẵng - Bx Hội An</item>
         <item>Tuyến 2: Kim Liên - Chợ Hàn</item>
         <item>Tuyến 3: Bx Trung tâm Đà Nẵng - Bx Ái Nghĩa</item>

@@ -21,6 +21,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Copyright by Gio.
@@ -49,12 +50,16 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
     void afterViews() {
         String carriage = getIntent().getStringExtra("Carriage");
         if (carriage != null) {
-            spBusCarriage.setSelection(Integer.parseInt(carriage) - 1);
+            spBusCarriage.setSelection(Integer.parseInt(carriage));
         }
 //        mAdapter = new ListBusStopAdapter(mResults);
         busStopDatabase = new BusStopDatabase(this);
         mPlaceStops = new ArrayList<>();
-        mPlaceStops = busStopDatabase.getPlacesByIdCarriage(carriage);
+        if (Objects.equals(carriage, "0")) {
+            mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+        } else {
+            mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(carriage));
+        }
         mAdapter = new ListBusStopAdapter(mPlaceStops);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -67,7 +72,11 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mPlaceStops.clear();
-                mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(String.valueOf(spBusCarriage.getSelectedItemPosition() + 1)));
+                if (i == 0) {
+                    mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+                } else {
+                    mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(String.valueOf(spBusCarriage.getSelectedItemPosition())));
+                }
                 mAdapter.notifyDataSetChanged();
             }
 
@@ -81,7 +90,7 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onPlaceClick(int id) {
                 Intent data = new Intent();
-                data.putExtra("idCarriage", String.valueOf(spBusCarriage.getSelectedItemPosition() + 1));
+                data.putExtra("idCarriage", String.valueOf(spBusCarriage.getSelectedItemPosition()));
                 data.putExtra("idPlace", id);
                 setResult(RESULT_OK, data);
                 finish();
