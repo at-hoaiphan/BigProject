@@ -561,7 +561,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 // Lấy ra vị trí.
                 LatLng locationNet = new LatLng(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude(),
                         locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
-                myLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 // Load Location via NetWork Provider
                 MarkerOptions option = new MarkerOptions();
                 option.title("My Location!");
