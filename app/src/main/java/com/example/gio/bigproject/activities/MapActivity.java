@@ -21,7 +21,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -471,7 +470,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
             // Lấy ra vị trí.
-            Log.d("abcde", "showMyLocation: " + LocationManager.GPS_PROVIDER);
             myLocation = locationManager.getLastKnownLocation(locationProvider);
         }
 
@@ -547,6 +545,43 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             });
         } else {
             Toast.makeText(this, "Load Location via GPS failed! Loading via network...", Toast.LENGTH_LONG).show();
+            try {
+                // Đoạn code nay cần người dùng cho phép (Hỏi ở trên ***).
+                if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                // Lấy ra vị trí.
+                LatLng locationNet = new LatLng(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude(),
+                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
+                myLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                // Load Location via NetWork Provider
+                MarkerOptions option = new MarkerOptions();
+                option.title("My Location!");
+                option.snippet(locationNet.latitude + "; " + locationNet.longitude);
+                option.position(locationNet);
+                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_marker));
+                currentMarker = myMap.addMarker(option);
+                currentMarker.setDraggable(true);
+                currentMarker.showInfoWindow();
+
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(locationNet)             // Sets the center of the map to location user
+                        .zoom(16)                   // Sets the zoom
+                        .bearing(90)                // Sets the orientation of the camera to east
+                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            } catch (Exception ignored) {
+
+            }
         }
     }
 
