@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +22,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -47,6 +50,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -94,8 +98,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Polyline mAllCarriagePolyline;
     private BusStopDatabase mBusStopDatabase;
     private Marker currentMarker;
+    private Marker movingMarker;
+    private Marker busMarker;
     private ViewPagerMarkerAdapter mAdapter;
     private static boolean isViewpagerVisibility = false;
+    private CountDownTimer mCountDownTimer;
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -311,6 +318,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         } else {
                             mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage));
                         }
+
                         if (mPlaceStops.size() > 0) {
                             for (int j = 0; j < mPlaceStops.size(); j++) {
                                 MarkerOptions option = new MarkerOptions();
@@ -327,6 +335,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         mViewPager.setAdapter(null);
                         mAdapter = new ViewPagerMarkerAdapter(getBaseContext(), getSupportFragmentManager(), mPlaceStops);
                         mViewPager.setAdapter(mAdapter);
+
+
                     }
 
                     @Override
@@ -350,7 +360,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         }
                         for (int i = 0; i < mListMarkers.size(); i++) {
                             if (marker.equals(mListMarkers.get(i))) {
-                                mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                                mListMarkers.get(i).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop_selected));
                                 previousSelectedMarker = mListMarkers.get(i);
                                 mViewPager.setCurrentItem(i, true);
                             }
@@ -457,9 +467,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
 
         // Millisecond
-        final long MIN_TIME_BW_UPDATES = 1000;
+        final long MIN_TIME_BW_UPDATES = 10000;
         // Met
-        final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
+        final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
 
         Location myLocation;
         try {
@@ -498,7 +508,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     .bearing(90)                // Sets the orientation of the camera to east
                     .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
-            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
 
             myMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
@@ -582,6 +592,21 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
             }
         }
+
+        myMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location location) {
+                if (movingMarker != null) {
+                    movingMarker.remove();
+                }
+                MarkerOptions option = new MarkerOptions();
+                option.title("My Location!");
+                option.position(new LatLng(location.getLatitude(), location.getLongitude()));
+                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_placeholder));
+                movingMarker = myMap.addMarker(option);
+                movingMarker.showInfoWindow();
+            }
+        });
     }
 
     @Override
@@ -605,7 +630,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         } catch (Exception ignored) {
 
         }
-        mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+        mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop_selected));
         previousSelectedMarker = mListMarkers.get(position);
     }
 
@@ -627,8 +652,12 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
                                 // Display distance and duration of Destination
                                 if (mRoutes.size() > 0) {
-                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+                                    String text = "This is <font color='red'>red</font>. This is <font color='blue'>blue</font>.";
+//                                    textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
+//                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+//                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+
+                                    mListMarkers.get(position).setSnippet(Html.fromHtml(text));
                                     mListMarkers.get(position).showInfoWindow();
                                 }
                             } else {
@@ -680,19 +709,55 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private void drawCarriagePoly(String carriage) {
         // points: overview_polyline
         PolylineOptions carriagePolyOption = new PolylineOptions().geodesic(true).width(25);
-        ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
+        final ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
         switch (carriage) {
             case "1":
+                mCountDownTimer.cancel();
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly1());
                 carriagePolyOption.color(Color.parseColor("#99FF373E"));
                 break;
             case "2":
+                mCountDownTimer.cancel();
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly2());
                 carriagePolyOption.color(Color.parseColor("#88FFF837"));
                 break;
             case "3":
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly3());
                 carriagePolyOption.color(Color.parseColor("#7337FF37"));
+
+                MarkerOptions option = new MarkerOptions();
+                option.title("Bus here!");
+                option.position(new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude));
+                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                busMarker = myMap.addMarker(option);
+//                busMarker.showInfoWindow();
+                Log.d("bla", "drawCarriagePoly: " + arrCarriageDecode.size());
+                mCountDownTimer = new CountDownTimer((arrCarriageDecode.size()) * 1000, 1000) {
+                    int index = 0;
+                    Double heading;
+                    LatLng busPosition = new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude);
+                    public void onTick(long millisUntilFinished) {
+                        busPosition = new LatLng(arrCarriageDecode.get(index).latitude, arrCarriageDecode.get(index).longitude);
+                        busMarker.setPosition(busPosition);
+                        heading = SphericalUtil.computeHeading(new LatLng(arrCarriageDecode.get(index).latitude, arrCarriageDecode.get(index).longitude),
+                                new LatLng(arrCarriageDecode.get(++index).latitude, arrCarriageDecode.get(++index).longitude));
+                        if (index == arrCarriageDecode.size() - 1) {
+                            cancel();
+                        }
+                        CameraPosition cameraBusPosition =
+                                new CameraPosition.Builder()
+                                        .target(busPosition)
+                                        .bearing(heading.floatValue())
+                                        .tilt(40)
+                                        .zoom(16)
+                                        .build();
+                        myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraBusPosition));
+                    }
+
+                    public void onFinish() {
+                        busMarker.remove();
+                    }
+                }.start();
                 break;
         }
         // Draw polylines
@@ -819,7 +884,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         .tilt(40)                   // Sets the tilt of the camera to 40 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                mListMarkers.get(idPlace).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+                mListMarkers.get(idPlace).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop_selected));
                 loadDirections(idPlace);
                 previousSelectedMarker = mListMarkers.get(idPlace);
             }
