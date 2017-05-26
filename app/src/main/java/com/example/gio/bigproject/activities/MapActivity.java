@@ -22,7 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -652,12 +651,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
                                 // Display distance and duration of Destination
                                 if (mRoutes.size() > 0) {
-                                    String text = "This is <font color='red'>red</font>. This is <font color='blue'>blue</font>.";
-//                                    textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-//                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-//                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
-
-                                    mListMarkers.get(position).setSnippet(Html.fromHtml(text));
+                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
                                     mListMarkers.get(position).showInfoWindow();
                                 }
                             } else {
