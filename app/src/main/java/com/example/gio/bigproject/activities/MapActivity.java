@@ -101,6 +101,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker busMarker;
     private ViewPagerMarkerAdapter mAdapter;
     private static boolean isViewpagerVisibility = false;
+    private static boolean isDirected = false;
     private CountDownTimer mCountDownTimer;
 
     // Request for location (***).
@@ -182,6 +183,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         try {
             if (isOnline()) {
                 if (isViewpagerVisibility) {
+                    isDirected = true;
                     // points: overview_polyline
                     ArrayList<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
                     // Draw polylines
@@ -296,6 +298,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         positionCarriage = String.valueOf(i);
                         // Reload map
                         myMap.clear();
+                        isDirected = false;
 
                         // draw carriage
                         if (Objects.equals(positionCarriage, String.valueOf(0))) {
@@ -595,15 +598,30 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         myMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (movingMarker != null) {
-                    movingMarker.remove();
+                if (isDirected) {
+                    LatLng previousLatLngMoving = new LatLng(0, 0);
+                    if (movingMarker != null) {
+                        previousLatLngMoving = new LatLng(movingMarker.getPosition().latitude, movingMarker.getPosition().longitude);
+                        movingMarker.remove();
+                    }
+                    MarkerOptions option = new MarkerOptions();
+                    option.title("My Location!");
+                    option.position(new LatLng(location.getLatitude(), location.getLongitude()));
+                    option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_placeholder));
+                    movingMarker = myMap.addMarker(option);
+                    movingMarker.showInfoWindow();
+
+                    Double heading = SphericalUtil.computeHeading(previousLatLngMoving, new LatLng(location.getLatitude(), location.getLongitude()));
+
+                    CameraPosition cameraBusPosition =
+                            new CameraPosition.Builder()
+                                    .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                                    .bearing(heading.floatValue())
+                                    .tilt(40)
+                                    .zoom(16)
+                                    .build();
+                    myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraBusPosition));
                 }
-                MarkerOptions option = new MarkerOptions();
-                option.title("My Location!");
-                option.position(new LatLng(location.getLatitude(), location.getLongitude()));
-                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_placeholder));
-                movingMarker = myMap.addMarker(option);
-                movingMarker.showInfoWindow();
             }
         });
     }
@@ -613,8 +631,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Clear old direction
         if (mPolyline != null) {
             mPolyline.remove();
+            isDirected = false;
         }
         loadDirections(position);
+        loadTimeRemain(position);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
                 .zoom(16)                   // Sets the zoom
@@ -670,8 +690,45 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
     }
 
+    // Load time remain from bus to bus-stop
+    private void loadTimeRemain(final int position) {
+        try {
+            mSoServiceDirection.getPlacesDirection(String.valueOf(busMarker.getPosition().latitude)
+                            + "," + String.valueOf(busMarker.getPosition().longitude),
+                    mListMarkers.get(position).getPosition().latitude
+                            + "," + mListMarkers.get(position).getPosition().longitude,
+                    "car",
+                    ApiUtilsBus.KEY)
+                    .enqueue(new Callback<SOPlacesDirectionResponse>() {
+                        @Override
+                        public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+
+                            if (response.isSuccessful()) {
+                                // Display dduration of Remaining time
+                                if (mRoutes.size() > 0) {
+                                    String distanceDuration = mListMarkers.get(position).getSnippet();
+                                    mListMarkers.get(position).setSnippet(distanceDuration
+                                            + " - remain: " + response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText());
+                                    mListMarkers.get(position).showInfoWindow();
+                                }
+                            } else {
+                                Toast.makeText(MapActivity.this, "Missing load time remain for bus from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+                            Toast.makeText(MapActivity.this, "Load remain time failed from API, please check internet and restart app again!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (Exception e) {
+            Toast.makeText(this, "Request directions from Google error!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadMap() {
         myMap.clear();
+        isDirected = false;
         if (previousSelectedMarker != null) {
             previousSelectedMarker.remove();
         }
@@ -707,54 +764,44 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         final ArrayList<LatLng> arrCarriageDecode = new ArrayList<>();
         switch (carriage) {
             case "1":
-                mCountDownTimer.cancel();
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly1());
                 carriagePolyOption.color(Color.parseColor("#99FF373E"));
                 break;
             case "2":
-                mCountDownTimer.cancel();
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly2());
                 carriagePolyOption.color(Color.parseColor("#88FFF837"));
                 break;
             case "3":
                 arrCarriageDecode.addAll(CarriagePolyline.getCarriagePoly3());
                 carriagePolyOption.color(Color.parseColor("#7337FF37"));
-
-                MarkerOptions option = new MarkerOptions();
-                option.title("Bus here!");
-                option.position(new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude));
-                option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
-                busMarker = myMap.addMarker(option);
-//                busMarker.showInfoWindow();
-                Log.d("bla", "drawCarriagePoly: " + arrCarriageDecode.size());
-                mCountDownTimer = new CountDownTimer((arrCarriageDecode.size()) * 1000, 1000) {
-                    int index = 0;
-                    Double heading;
-                    LatLng busPosition = new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude);
-                    public void onTick(long millisUntilFinished) {
-                        busPosition = new LatLng(arrCarriageDecode.get(index).latitude, arrCarriageDecode.get(index).longitude);
-                        busMarker.setPosition(busPosition);
-                        heading = SphericalUtil.computeHeading(new LatLng(arrCarriageDecode.get(index).latitude, arrCarriageDecode.get(index).longitude),
-                                new LatLng(arrCarriageDecode.get(++index).latitude, arrCarriageDecode.get(++index).longitude));
-                        if (index == arrCarriageDecode.size() - 1) {
-                            cancel();
-                        }
-                        CameraPosition cameraBusPosition =
-                                new CameraPosition.Builder()
-                                        .target(busPosition)
-                                        .bearing(heading.floatValue())
-                                        .tilt(40)
-                                        .zoom(16)
-                                        .build();
-                        myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraBusPosition));
-                    }
-
-                    public void onFinish() {
-                        busMarker.remove();
-                    }
-                }.start();
                 break;
         }
+
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+        }
+        MarkerOptions option = new MarkerOptions();
+        option.title("Bus here!");
+        option.position(new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude));
+        option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
+        busMarker = myMap.addMarker(option);
+//                busMarker.showInfoWindow();
+        Log.d("bla", "drawCarriagePoly: " + arrCarriageDecode.size());
+        mCountDownTimer = new CountDownTimer((arrCarriageDecode.size()) * 5000, 5000) {
+            int index = 0;
+            LatLng busPosition = new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude);
+            public void onTick(long millisUntilFinished) {
+                if (index == arrCarriageDecode.size() - 1) {
+                    cancel();
+                }
+                busPosition = new LatLng(arrCarriageDecode.get(++index).latitude, arrCarriageDecode.get(++index).longitude);
+                busMarker.setPosition(busPosition);
+            }
+
+            public void onFinish() {
+                busMarker.remove();
+            }
+        }.start();
         // Draw polylines
 
         for (int k = 0; k < arrCarriageDecode.size(); k++) {
