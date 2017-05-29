@@ -16,12 +16,13 @@ import retrofit2.Response;
  * Created on 4/14/2017.
  */
 
-public class MockData {
+class MockData {
 
+    // Get Data from service
     private static final ArrayList<Result> mResults = new ArrayList<>();
     // Get data from Json
     private static SOServiceBus mService = ApiUtilsBus.getSOService();
-    public static int RESULT_COUNT;
+    private static int RESULT_COUNT;
 
     public static void createData() {
         mService.getBusStop("tram xe buyt", "16.08,108.22", ApiUtilsBus.KEY)

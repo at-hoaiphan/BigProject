@@ -8,11 +8,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created on 4/5/2017.
  */
 
-public class BusRetrofitClient {
+class BusRetrofitClient {
 
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient(String baseUrl) {
+    static Retrofit getClient(String baseUrl) {
         if (retrofit==null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)

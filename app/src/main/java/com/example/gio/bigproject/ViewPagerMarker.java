@@ -31,7 +31,7 @@ public class ViewPagerMarker extends Fragment {
 
     @Pref
     SettingsInterface_ settingsInterface;
-    private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
+//    private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
 
     public ViewPagerMarker() {
     }
