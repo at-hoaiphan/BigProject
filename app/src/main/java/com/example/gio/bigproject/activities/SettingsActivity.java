@@ -22,9 +22,9 @@ import java.util.Objects;
  * Copyright by Gio.
  * Created on 4/28/2017.
  */
-@EActivity(R.layout.settings)
+@EActivity(R.layout.activity_settings)
 public class SettingsActivity extends AppCompatActivity {
-
+    private static final String MAP_VIEW_TYPE_TRAFFIC = "Traffic";
     @ViewById(R.id.radioGroupMode)
     RadioGroup rdGroupMode;
     @ViewById(R.id.rbWalking)
@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         int checkedRbTypeId = rdGroupType.getCheckedRadioButtonId();
         RadioButton rbCheckedType = (RadioButton) findViewById(checkedRbTypeId);
         int type;
-        if (Objects.equals(rbCheckedType.getText().toString(), "Traffic")) {
+        if (Objects.equals(rbCheckedType.getText().toString(), MAP_VIEW_TYPE_TRAFFIC)) {
             type = 1;
         } else {
             type = 2;
@@ -91,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void reloadMap() {
         Intent data = new Intent();
-        data.putExtra("needReload", true);
+        data.putExtra(MapActivity.NEED_RELOAD, true);
         this.setResult(RESULT_OK, data);
         finish();
     }

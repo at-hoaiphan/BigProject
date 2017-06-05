@@ -31,6 +31,9 @@
     <string name="dut">Danang University of Technology</string>
     <string name="address">Address</string>
     <string name="address_">Address:</string>
+    <string name="author_image">Author Image</string>
+    <string name="mode_transport">Mode Transport</string>
+    <string name="image_bus_stop">Image Bus Stop</string>
 
     <string-array name="carriages_array">
         <item>Tất cả</item>
