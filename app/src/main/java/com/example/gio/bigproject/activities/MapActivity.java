@@ -233,7 +233,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 mViewPager.setVisibility(View.GONE);
                 isViewpagerVisibility = false;
 
-                // Đã tải thành công thì tắt Dialog Progress đi
+                // Dismiss Dialog Progress when downloading finished
                 myProgress.dismiss();
 
                 // Add Detail location
@@ -370,7 +370,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         return false;
                     }
                 });
-                // Hiển thị vị trí người dùng.
+                // Show User's Location
                 askPermissionsAndShowMyLocation();
             }
         });
@@ -440,13 +440,12 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
     }
 
-    // Tìm một nhà cung cấp vị trị hiện thời đang được mở.
+    // Find a Location Provider
     private String getEnabledLocationProvider() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        // Tiêu chí để tìm một nhà cung cấp vị trí.
         Criteria criteria = new Criteria();
 
-        // Tìm một nhà cung vị trí hiện thời tốt nhất theo tiêu chí trên.
+        // Find the best LocationProvider
         // ==> "gps", "network",...
         String bestProvider = locationManager.getBestProvider(criteria, true);
         boolean enabled = locationManager.isProviderEnabled(bestProvider);
@@ -458,7 +457,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         return bestProvider;
     }
 
-    // Chỉ gọi phương thức này khi đã có quyền xem vị trí người dùng.
+    // Call only when had location-permission
     private void showMyLocation() {
         final LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
@@ -475,17 +474,16 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         Location myLocation;
         try {
-            // Đoạn code nay cần người dùng cho phép (Hỏi ở trên ***).
             locationManager.requestLocationUpdates(
                     locationProvider,
                     MIN_TIME_BW_UPDATES,
                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-            // Lấy ra vị trí.
+            // Get location.
             myLocation = locationManager.getLastKnownLocation(locationProvider);
         }
 
-        // Với Android API >= 23 phải catch SecurityException.
+        // Android API >= 23 catch SecurityException.
         catch (SecurityException e) {
             Toast.makeText(this, "Show your location error!", Toast.LENGTH_LONG).show();
             return;
@@ -558,7 +556,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         } else {
             Toast.makeText(this, "Load Location via GPS failed! Loading via network...", Toast.LENGTH_LONG).show();
             try {
-                // Đoạn code nay cần người dùng cho phép (Hỏi ở trên ***).
                 if (ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(this,
@@ -570,7 +567,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         MIN_TIME_BW_UPDATES,
                         MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                // Lấy ra vị trí.
+                // Get Location.
                 LatLng locationNet = new LatLng(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude(),
                         locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
                 // Load Location via NetWork Provider
