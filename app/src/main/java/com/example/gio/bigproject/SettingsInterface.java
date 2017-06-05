@@ -1,7 +1,5 @@
 package com.example.gio.bigproject;
 
-import com.example.gio.bigproject.activities.MapActivity;
-
 import org.androidannotations.annotations.sharedpreferences.DefaultInt;
 import org.androidannotations.annotations.sharedpreferences.DefaultString;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
@@ -19,7 +17,7 @@ public interface SettingsInterface {
     @DefaultInt(R.id.rbTrafficType)
     int checkedViewType();
 
-    @DefaultString(MapActivity.WALKING)
+    @DefaultString("Walking")
     String mode();
     @DefaultInt(1)
     int type();
