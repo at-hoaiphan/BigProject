@@ -27,7 +27,6 @@ public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        Log.d("TAG", "getItem: " + mPlaceStops.get(position));
         return new ViewPagerMarker().newInstance(mPlaceStops.get(position));
     }
 
@@ -44,7 +43,6 @@ public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public int getItemPosition(Object object) {
-        Log.d("ViewPager check ", "getItemPosition: " + mPlaceStops.size());
         return POSITION_NONE;
     }
 }
