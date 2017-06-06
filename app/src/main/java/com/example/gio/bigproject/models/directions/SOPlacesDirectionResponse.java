@@ -5,11 +5,13 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * Copyright by Gio.
  * Created on 4/20/2017.
  */
-
+@Data
 public class SOPlacesDirectionResponse {
     @SerializedName("routes")
     @Expose
@@ -17,21 +19,4 @@ public class SOPlacesDirectionResponse {
     @SerializedName("status")
     @Expose
     private String status;
-
-    public void setRoutes(List<RouteDirec> routes) {
-        this.routes = routes;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-
-    public List<RouteDirec> getRoutes() {
-        return routes;
-    }
-
-    public String getStatus() {
-        return status;
-    }
 }

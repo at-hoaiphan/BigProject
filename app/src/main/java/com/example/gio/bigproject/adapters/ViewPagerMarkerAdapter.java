@@ -15,7 +15,7 @@ import java.util.List;
  * Created on 4/14/2017.
  */
 
-public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
+public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter {
     private List<PlaceStop> mPlaceStops;
     private Context mContext;
 
@@ -31,7 +31,8 @@ public class ViewPagerMarkerAdapter extends FragmentStatePagerAdapter{
     }
 
     @Override
-    public int getCount() { return mPlaceStops.size();
+    public int getCount() {
+        return mPlaceStops.size();
     }
 
     @Override

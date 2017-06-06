@@ -19,7 +19,6 @@ import java.util.List;
  */
 
 public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
-
     //    private List<Result> mItems;
     private List<PlaceStop> mItems;
     private PlaceListener mPlaceListener;
@@ -51,10 +50,8 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
 
     @Override
     public ListBusStopAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-
         View postView = inflater.inflate(R.layout.item_place, parent, false);
 
         return new ViewHolder(postView);
@@ -62,7 +59,6 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
 
     @Override
     public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
-
         PlaceStop item = mItems.get(position);
         TextView tvLatLongStation = holder.tvLatLongStation;
         TextView tvNameStation = holder.tvNameStation;
@@ -77,15 +73,6 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
     public int getItemCount() {
         return mItems.size();
     }
-
-//    public void updateAnswers(List<PlaceStop> items) {
-//        mItems = items;
-//        notifyDataSetChanged();
-//    }
-
-//    private PlaceStop getItem(int adapterPosition) {
-//        return mItems.get(adapterPosition);
-//    }
 
     public interface PlaceListener {
         void onPlaceClick(int id);

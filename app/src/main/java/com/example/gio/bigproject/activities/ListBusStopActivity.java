@@ -29,13 +29,13 @@ import java.util.Objects;
  */
 
 @EActivity(R.layout.activity_list_places)
-public class ListBusStopActivity extends AppCompatActivity  {
+public class ListBusStopActivity extends AppCompatActivity {
     static final String DEFAULT_CARRIAGE = "0";
     static final String ID_CARRIAGE = "idCarriage";
     static final String ID_PLACE = "idPlace";
 
     @Extra("Carriage")
-    String carriage;
+    String mCarriage;
 
     @ViewById(R.id.rvPlaces)
     RecyclerView mRecyclerView;
@@ -50,16 +50,16 @@ public class ListBusStopActivity extends AppCompatActivity  {
     @AfterViews
     void afterViews() {
 //        String carriage = getIntent().getStringExtra("Carriage");
-        if (carriage != null) {
-            mSpnBusCarriage.setSelection(Integer.parseInt(carriage));
+        if (mCarriage != null) {
+            mSpnBusCarriage.setSelection(Integer.parseInt(mCarriage));
         }
 //        mAdapter = new ListBusStopAdapter(mResults);
         mBusStopDatabase = new BusStopDatabase(this);
         mPlaceStops = new ArrayList<>();
-        if (Objects.equals(carriage, DEFAULT_CARRIAGE)) {
+        if (Objects.equals(mCarriage, DEFAULT_CARRIAGE)) {
             mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
         } else {
-            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(carriage));
+            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(mCarriage));
         }
         mAdapter = new ListBusStopAdapter(mPlaceStops);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -105,7 +105,6 @@ public class ListBusStopActivity extends AppCompatActivity  {
     void clickBack() {
         finish();
     }
-
 
 
 //    // Call Results by API

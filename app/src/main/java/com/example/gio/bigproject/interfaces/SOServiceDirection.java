@@ -12,9 +12,9 @@ import retrofit2.http.Query;
  */
 
 public interface SOServiceDirection {
-        @GET("directions/json")
-        Call<SOPlacesDirectionResponse> getPlacesDirection(@Query("origin") String origin, @Query("destination") String destination, @Query("mode") String walking_bicycling_driving_transit, @Query("key") String KEY);
+    @GET("directions/json")
+    Call<SOPlacesDirectionResponse> getPlacesDirection(@Query("origin") String origin, @Query("destination") String destination, @Query("mode") String walking_bicycling_driving_transit, @Query("key") String KEY);
 
-        @GET("directions/json?origin=16.08,108.22&destination=16.078,108.2&key=AIzaSyCWRI3EjJmfetSH3hK-NoZY_wMGPXx5ncg")
-        Call<SOPlacesDirectionResponse> getPlacesDirection();
+    @GET("directions/json?origin=16.08,108.22&destination=16.078,108.2&key=AIzaSyCWRI3EjJmfetSH3hK-NoZY_wMGPXx5ncg")
+    Call<SOPlacesDirectionResponse> getPlacesDirection();
 }

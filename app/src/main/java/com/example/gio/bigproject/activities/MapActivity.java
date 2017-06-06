@@ -52,6 +52,7 @@ import com.google.maps.android.SphericalUtil;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
@@ -77,7 +78,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final int LIST_PLACES = 88;
     public static final int MAP_TYPE_NORMAL = 1;
     public static final int MAP_TYPE_SATELLITE = 2;
-    public static final String CARRIAGE = "Carriage";
     public static final String CHECK_CHOOSE_DESTINATION = "Please choose your destination!";
     public static final String CHECK_NETWORK = "No internet, please check your network!";
     public static final String LOAD_DATA_FAILED = "Load data failed!";
@@ -103,6 +103,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private static boolean isViewpagerVisibility;
     private static boolean isDirected;
 
+    @Extra("Carriage")
+    String mCarriage;
     @ViewById(R.id.viewpagerLocation)
     ViewPager mViewPager;
 
@@ -231,7 +233,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Click(R.id.fabListBusStops)
     void clickListButton() {
-        ListBusStopActivity_.intent(this).carriage(positionCarriage).startForResult(LIST_PLACES);
+        ListBusStopActivity_.intent(this).mCarriage(positionCarriage).startForResult(LIST_PLACES);
 //        Intent intent = new Intent(this, ListBusStopActivity_.class);
 //        intent.putExtra(CARRIAGE, positionCarriage);
 //        startActivityForResult(intent, LIST_PLACES);

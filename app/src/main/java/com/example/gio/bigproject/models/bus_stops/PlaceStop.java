@@ -4,12 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 
+import lombok.Data;
+
 /**
  * Copyright by Gio.
  * Created on 4/24/2017.
  */
-
-public class PlaceStop implements BaseColumns, Parcelable{
+@Data
+public class PlaceStop implements BaseColumns, Parcelable {
     private int id;
     private String name;
     private double latitude;
@@ -17,7 +19,7 @@ public class PlaceStop implements BaseColumns, Parcelable{
     private String carriage;
     private String address;
 
-    protected PlaceStop(Parcel in) {
+    private PlaceStop(Parcel in) {
         id = in.readInt();
         name = in.readString();
         latitude = in.readDouble();
@@ -37,30 +39,6 @@ public class PlaceStop implements BaseColumns, Parcelable{
             return new PlaceStop[size];
         }
     };
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public String getCarriage() {
-        return carriage;
-    }
-
-    public String getAddress() {
-        return address;
-    }
 
     public PlaceStop(int id, String name, double latitude, double longitude, String carriage, String address) {
         this.id = id;
@@ -85,9 +63,4 @@ public class PlaceStop implements BaseColumns, Parcelable{
         parcel.writeString(carriage);
         parcel.writeString(address);
     }
-
-//    @Override
-//    public String toString() {
-//        return "{" + name + "\t" + address + "}";
-//    }
 }

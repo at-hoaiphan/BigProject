@@ -11,7 +11,7 @@ import com.example.gio.bigproject.R;
  * Created on 4/14/2017.
  */
 
-public class SplashActivity extends AppCompatActivity{
+public class SplashActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

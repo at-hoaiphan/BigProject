@@ -28,22 +28,22 @@ class MockData {
     public static void createData() {
         mService.getBusStop("tram xe buyt", "16.08,108.22", ApiUtilsBus.KEY)
                 .enqueue(new Callback<SOStationsResponse>() {
-            @Override
-            public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
+                    @Override
+                    public void onResponse(Call<SOStationsResponse> call, Response<SOStationsResponse> response) {
 
-                if (response.isSuccessful()) {
-                    if (mResults.size() != 0) {
-                        mResults.clear();
+                        if (response.isSuccessful()) {
+                            if (mResults.size() != 0) {
+                                mResults.clear();
+                            }
+                            mResults.addAll(response.body().getResults());
+                            RESULT_COUNT = mResults.size();
+                        }
                     }
-                    mResults.addAll(response.body().getResults());
-                    RESULT_COUNT = mResults.size();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<SOStationsResponse> call, Throwable t) {
-            }
-        });
+                    @Override
+                    public void onFailure(Call<SOStationsResponse> call, Throwable t) {
+                    }
+                });
 
     }
 

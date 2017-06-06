@@ -3,12 +3,14 @@ package com.example.gio.bigproject.models.bus_stops;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import lombok.Data;
+
 /**
  * Copyright by Gio.
  * Created on 4/17/2017.
  */
-
-public class LocaBus {
+@Data
+class LocaBus {
 
     @SerializedName("lat")
     @Expose
@@ -16,21 +18,4 @@ public class LocaBus {
     @SerializedName("lng")
     @Expose
     private Double lng;
-
-    public Double getLat() {
-        return lat;
-    }
-
-    public void setLat(Double lat) {
-        this.lat = lat;
-    }
-
-    public Double getLng() {
-        return lng;
-    }
-
-    public void setLng(Double lng) {
-        this.lng = lng;
-    }
-
 }
