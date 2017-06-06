@@ -1,7 +1,6 @@
 package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,13 +10,14 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.adapter.ListBusStopAdapter;
-import com.example.gio.bigproject.data.BusStopDatabase;
-import com.example.gio.bigproject.model.bus_stop.PlaceStop;
+import com.example.gio.bigproject.adapters.ListBusStopAdapter;
+import com.example.gio.bigproject.datas.BusStopDatabase;
+import com.example.gio.bigproject.models.bus_stops.PlaceStop;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -29,36 +29,39 @@ import java.util.Objects;
  */
 
 @EActivity(R.layout.activity_list_places)
-public class ListBusStopActivity extends AppCompatActivity implements View.OnClickListener {
+public class ListBusStopActivity extends AppCompatActivity {
+    static final String DEFAULT_CARRIAGE = "0";
+    static final String ID_CARRIAGE = "idCarriage";
+    static final String ID_PLACE = "idPlace";
+
+    @Extra("Carriage")
+    String mCarriage;
+
     @ViewById(R.id.rv_places)
     RecyclerView mRecyclerView;
 
-    @ViewById(R.id.fabBack)
-    FloatingActionButton fabBack;
-
-    @ViewById(R.id.spBusCarriage)
-    Spinner spBusCarriage;
+    @ViewById(R.id.spnBusCarriage)
+    Spinner mSpnBusCarriage;
 
     private ListBusStopAdapter mAdapter;
-    //    private SOServiceBus mService;
-    private BusStopDatabase busStopDatabase;
+    private BusStopDatabase mBusStopDatabase;
     private ArrayList<PlaceStop> mPlaceStops;
 
 //    private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
-        String carriage = getIntent().getStringExtra("Carriage");
-        if (carriage != null) {
-            spBusCarriage.setSelection(Integer.parseInt(carriage));
+//        String carriage = getIntent().getStringExtra("Carriage");
+        if (mCarriage != null) {
+            mSpnBusCarriage.setSelection(Integer.parseInt(mCarriage));
         }
 //        mAdapter = new ListBusStopAdapter(mResults);
-        busStopDatabase = new BusStopDatabase(this);
+        mBusStopDatabase = new BusStopDatabase(this);
         mPlaceStops = new ArrayList<>();
-        if (Objects.equals(carriage, "0")) {
-            mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+        if (Objects.equals(mCarriage, DEFAULT_CARRIAGE)) {
+            mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
         } else {
-            mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(carriage));
+            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(mCarriage));
         }
         mAdapter = new ListBusStopAdapter(mPlaceStops);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -68,18 +71,19 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
 
-        spBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSpnBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mPlaceStops.clear();
                 if (i == 0) {
-                    mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+                    mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
                 } else {
-                    mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(String.valueOf(spBusCarriage.getSelectedItemPosition())));
+                    mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(String.valueOf(mSpnBusCarriage.getSelectedItemPosition())));
                 }
                 mAdapter.notifyDataSetChanged();
             }
 
+            // Not use
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -90,8 +94,8 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onPlaceClick(int id) {
                 Intent data = new Intent();
-                data.putExtra("idCarriage", String.valueOf(spBusCarriage.getSelectedItemPosition()));
-                data.putExtra("idPlace", id);
+                data.putExtra(ID_CARRIAGE, String.valueOf(mSpnBusCarriage.getSelectedItemPosition()));
+                data.putExtra(ID_PLACE, id);
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -104,10 +108,7 @@ public class ListBusStopActivity extends AppCompatActivity implements View.OnCli
         finish();
     }
 
-    @Override
-    public void onClick(View view) {
 
-    }
 
 //    // Call Results by API
 //    public void loadBusStops() {
