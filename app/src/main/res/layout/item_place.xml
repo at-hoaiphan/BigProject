@@ -8,8 +8,7 @@
     <ImageView
         android:id="@+id/imgStation"
         android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:contentDescription="@string/image_bus_stop" />
+        android:layout_height="100dp" />
 
     <TextView
         android:id="@+id/tvNameStation"

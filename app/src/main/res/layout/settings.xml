@@ -95,18 +95,18 @@
         >
 
         <ImageView
-            android:id="@+id/imageViewTraffic"
+            android:id="@+id/imageView"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:contentDescription="@string/illustration"
             android:src="@drawable/img_traffic_type" />
 
         <ImageView
-            android:id="@+id/imageViewSatellite"
+            android:id="@+id/imageView2"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginStart="5dp"
-            android:layout_toEndOf="@+id/imageViewTraffic"
+            android:layout_toEndOf="@+id/imageView"
             android:contentDescription="@string/illustration"
             android:src="@drawable/img_satellite_type" />
     </RelativeLayout>

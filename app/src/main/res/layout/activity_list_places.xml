@@ -11,7 +11,7 @@
         android:entries="@array/carriages_name_array" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvPlaces"
+        android:id="@+id/rv_places"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/spnBusCarriage"/>

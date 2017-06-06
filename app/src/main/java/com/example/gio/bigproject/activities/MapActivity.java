@@ -100,9 +100,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final String WALKING = "walking";
     public static String positionCarriage;
 
-    private static boolean isViewpagerVisibility;
-    private static boolean isDirected;
-
     @Extra("Carriage")
     String mCarriage;
     @ViewById(R.id.viewpagerLocation)
@@ -128,6 +125,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker mMovingMarker;
     private Marker mBusMarker;
     private ViewPagerMarkerAdapter mAdapter;
+    private static boolean isViewpagerVisibility = false;
+    private static boolean isDirected = false;
     private CountDownTimer mCountDownTimer;
     private List<PlaceStop> mPlaceStops = new ArrayList<>();
 

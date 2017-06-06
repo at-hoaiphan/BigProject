@@ -22,8 +22,7 @@
         android:layout_height="200dp"
         android:src="@drawable/img_avatar"
         android:layout_below="@+id/tvTitle"
-        android:layout_centerHorizontal="true"
-        android:contentDescription="@string/author_image" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/lblName"
@@ -54,7 +53,7 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/tvTel"
+        android:id="@+id/tvNTel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/lblTel"

@@ -51,7 +51,7 @@
         android:prompt="@string/list_bus_carriage"/>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewpagerLocation"
+        android:id="@+id/viewpager_location"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"

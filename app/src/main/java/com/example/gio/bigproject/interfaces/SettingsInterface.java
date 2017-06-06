@@ -17,7 +17,6 @@ public interface SettingsInterface {
 
     @DefaultInt(R.id.rbWalking)
     int checkedModeType();
-
     @DefaultInt(R.id.rbTrafficType)
     int checkedViewType();
 

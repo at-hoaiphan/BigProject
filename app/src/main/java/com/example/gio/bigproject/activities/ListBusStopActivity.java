@@ -1,6 +1,7 @@
 package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,6 +47,8 @@ public class ListBusStopActivity extends AppCompatActivity {
     private ListBusStopAdapter mAdapter;
     private BusStopDatabase mBusStopDatabase;
     private ArrayList<PlaceStop> mPlaceStops;
+
+//    private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
@@ -105,6 +108,7 @@ public class ListBusStopActivity extends AppCompatActivity {
     void clickBack() {
         finish();
     }
+
 
 
 //    // Call Results by API

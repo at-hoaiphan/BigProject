@@ -19,6 +19,7 @@ import java.util.List;
  */
 
 public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
+
     //    private List<Result> mItems;
     private List<PlaceStop> mItems;
     private PlaceListener mPlaceListener;

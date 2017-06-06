@@ -10,8 +10,7 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_margin="10dp"
-        android:src="@drawable/img_bus_rinning"
-        android:contentDescription="@string/mode_transport" />
+        android:src="@drawable/img_bus_rinning" />
 
     <TextView
         android:id="@+id/tvMarkerTitle"
@@ -20,7 +19,7 @@
         android:layout_toEndOf="@+id/imgLocation"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#000000" />
+        android:textColor="#000000"/>
 
     <TextView
         android:id="@+id/tvMarkerAddress"
