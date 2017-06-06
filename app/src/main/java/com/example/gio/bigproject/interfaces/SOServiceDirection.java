@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.datas;
+package com.example.gio.bigproject.interfaces;
 
 import com.example.gio.bigproject.models.directions.SOPlacesDirectionResponse;
 

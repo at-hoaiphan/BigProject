@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright by Gio.
@@ -52,16 +53,6 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         }
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
-    }
-
     private void copyDataBase() throws IOException {
         InputStream myInput = mContext.getAssets().open(DATABASE_NAME);
         String outFileName = DATABASE_PATH + DATABASE_NAME;
@@ -88,9 +79,9 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         return dbFile.exists();
     }
 
-    public ArrayList<PlaceStop> getAllPlaces() {
+    public List<PlaceStop> getAllPlaces() {
         mSqLiteDatabase = getWritableDatabase();
-        ArrayList<PlaceStop> listPlaces = new ArrayList<>();
+        List<PlaceStop> listPlaces = new ArrayList<>();
         Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -102,9 +93,9 @@ public class BusStopDatabase extends SQLiteOpenHelper {
         return listPlaces;
     }
 
-    public ArrayList<PlaceStop> getPlacesByIdCarriage(String idCarriage) {
+    public List<PlaceStop> getPlacesByIdCarriage(String idCarriage) {
         mSqLiteDatabase = getWritableDatabase();
-        ArrayList<PlaceStop> listPlaces = new ArrayList<>();
+        List<PlaceStop> listPlaces = new ArrayList<>();
         Cursor cursor = mSqLiteDatabase.rawQuery("select * from " + TABLE_PLACES + " where idCarriage like '%" + idCarriage + "%'", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -132,4 +123,15 @@ public class BusStopDatabase extends SQLiteOpenHelper {
 //        }
 //        return null;
 //    }
+
+    // Unused implemented-functions
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+
+    }
 }

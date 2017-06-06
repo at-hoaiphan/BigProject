@@ -27,12 +27,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.SettingsInterface_;
 import com.example.gio.bigproject.adapters.ViewPagerMarkerAdapter;
 import com.example.gio.bigproject.datas.ApiUtilsBus;
 import com.example.gio.bigproject.datas.BusStopDatabase;
 import com.example.gio.bigproject.datas.CarriagePolyline;
-import com.example.gio.bigproject.datas.SOServiceDirection;
+import com.example.gio.bigproject.interfaces.SOServiceDirection;
+import com.example.gio.bigproject.interfaces.SettingsInterface_;
 import com.example.gio.bigproject.models.bus_stops.PlaceStop;
 import com.example.gio.bigproject.models.directions.RouteDirec;
 import com.example.gio.bigproject.models.directions.SOPlacesDirectionResponse;
@@ -98,7 +98,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final String CARRIAGE_3 = "3";
     public static final String CAR = "car";
     public static final String WALKING = "walking";
-    public static final String NEED_RELOAD = "needReload";
     public static String positionCarriage;
 
     private static boolean isViewpagerVisibility;
@@ -134,7 +133,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     void afterViews() {
 //        // Request data from server
 //        MockData.createData();
-//        Log.d("Map", "afterViews: " + MockData.getData().size());
 
         positionCarriage = String.valueOf(mSpinnerBusCarriage.getSelectedItemPosition());
         mSoServiceDirection = ApiUtilsBus.getSOServiceDirection();
@@ -210,8 +208,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         polyOp.color(Color.BLUE);
                     }
                     polyOp.add(new LatLng(mCurrentMarker.getPosition().latitude, mCurrentMarker.getPosition().longitude));
-                    for (int i = 0; i < arrDecode.size(); i++) {
-                        polyOp.add(new LatLng(arrDecode.get(i).latitude, arrDecode.get(i).longitude));
+                    for (LatLng arrDecodeLatlng : arrDecode) {
+                        polyOp.add(arrDecodeLatlng);
                     }
                     polyOp.add(new LatLng(mListMarkers.get(mViewPager.getCurrentItem()).getPosition().latitude,
                             mListMarkers.get(mViewPager.getCurrentItem()).getPosition().longitude));
@@ -233,10 +231,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Click(R.id.fabListBusStops)
     void clickListButton() {
-//        ListBusStopActivity_.intent(this).startForResult(LIST_PLACES);
-        Intent intent = new Intent(this, ListBusStopActivity_.class);
-        intent.putExtra(CARRIAGE, positionCarriage);
-        startActivityForResult(intent, LIST_PLACES);
+        ListBusStopActivity_.intent(this).carriage(positionCarriage).startForResult(LIST_PLACES);
+//        Intent intent = new Intent(this, ListBusStopActivity_.class);
+//        intent.putExtra(CARRIAGE, positionCarriage);
+//        startActivityForResult(intent, LIST_PLACES);
     }
 
     private void onMyMapReady(final GoogleMap googleMap) {
@@ -285,13 +283,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
                 if (mPlaceStops.size() > 0) {
                     // Show default Bus Carriage
-                    for (int i = 0; i < mPlaceStops.size(); i++) {
+                    for (PlaceStop placeStop : mPlaceStops) {
                         MarkerOptions option = new MarkerOptions();
-                        option.title(mPlaceStops.get(i).getName());
-                        option.snippet(mPlaceStops.get(i).getLatitude()
-                                + ";" + mPlaceStops.get(i).getLongitude());
-                        option.position(new LatLng(mPlaceStops.get(i).getLatitude(),
-                                mPlaceStops.get(i).getLongitude()));
+                        option.title(placeStop.getName());
+                        option.snippet(placeStop.getLatitude() + ";" + placeStop.getLongitude());
+                        option.position(new LatLng(placeStop.getLatitude(), placeStop.getLongitude()));
                         option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                         Marker marker = mMyMap.addMarker(option);
                         mListMarkers.add(marker);
@@ -337,13 +333,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         }
 
                         if (mPlaceStops.size() > 0) {
-                            for (int j = 0; j < mPlaceStops.size(); j++) {
+                            for (PlaceStop placeStop : mPlaceStops) {
                                 MarkerOptions option = new MarkerOptions();
-                                option.title(mPlaceStops.get(j).getName());
-                                option.snippet(mPlaceStops.get(j).getLatitude()
-                                        + ";" + mPlaceStops.get(j).getLongitude());
-                                option.position(new LatLng(mPlaceStops.get(j).getLatitude(),
-                                        mPlaceStops.get(j).getLongitude()));
+                                option.title(placeStop.getName());
+                                option.snippet(placeStop.getLatitude() + ";" + placeStop.getLongitude());
+                                option.position(new LatLng(placeStop.getLatitude(), placeStop.getLongitude()));
                                 option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                                 Marker marker = mMyMap.addMarker(option);
                                 mListMarkers.add(marker);
@@ -752,13 +746,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage));
         }
         if (mPlaceStops.size() > 0) {
-            for (int j = 0; j < mPlaceStops.size(); j++) {
+            for (PlaceStop placeStop : mPlaceStops) {
                 MarkerOptions option = new MarkerOptions();
-                option.title(mPlaceStops.get(j).getName());
-                option.snippet(mPlaceStops.get(j).getLatitude()
-                        + ";" + mPlaceStops.get(j).getLongitude());
-                option.position(new LatLng(mPlaceStops.get(j).getLatitude(),
-                        mPlaceStops.get(j).getLongitude()));
+                option.title(placeStop.getName());
+                option.snippet(placeStop.getLatitude() + ";" + placeStop.getLongitude());
+                option.position(new LatLng(placeStop.getLatitude(), placeStop.getLongitude()));
                 option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
                 Marker marker = mMyMap.addMarker(option);
                 mListMarkers.add(marker);
@@ -803,6 +795,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mCountDownTimer = new CountDownTimer((arrCarriageDecode.size()) * 5000, 5000) {
             int index = 0;
             LatLng busPosition = new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude);
+
             public void onTick(long millisUntilFinished) {
                 if (index == arrCarriageDecode.size() - 1) {
                     cancel();
@@ -816,9 +809,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             }
         }.start();
         // Draw polylines
-
-        for (int k = 0; k < arrCarriageDecode.size(); k++) {
-            carriagePolyOption.add(new LatLng(arrCarriageDecode.get(k).latitude, arrCarriageDecode.get(k).longitude));
+        for (LatLng arrCarriage : arrCarriageDecode) {
+            carriagePolyOption.add(arrCarriage);
         }
 
         // Clear old Polyline
@@ -845,14 +837,14 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         PolylineOptions carriagePolyOption2 = new PolylineOptions().geodesic(true).color(Color.parseColor("#88FFF837")).width(23);
         PolylineOptions carriagePolyOption3 = new PolylineOptions().geodesic(true).color(Color.parseColor("#7337FF37")).width(15);
 
-        for (int k = 0; k < arrCarriageDecode1.size(); k++) {
-            carriagePolyOption1.add(new LatLng(arrCarriageDecode1.get(k).latitude, arrCarriageDecode1.get(k).longitude));
+        for (LatLng arrCarriage : arrCarriageDecode1) {
+            carriagePolyOption1.add(arrCarriage);
         }
-        for (int k = 0; k < arrCarriageDecode2.size(); k++) {
-            carriagePolyOption2.add(new LatLng(arrCarriageDecode2.get(k).latitude, arrCarriageDecode2.get(k).longitude));
+        for (LatLng arrCarriage : arrCarriageDecode2) {
+            carriagePolyOption2.add(arrCarriage);
         }
-        for (int k = 0; k < arrCarriageDecode3.size(); k++) {
-            carriagePolyOption3.add(new LatLng(arrCarriageDecode3.get(k).latitude, arrCarriageDecode3.get(k).longitude));
+        for (LatLng arrCarriage : arrCarriageDecode3) {
+            carriagePolyOption3.add(arrCarriage);
         }
 
         // Clear old direction
@@ -907,7 +899,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @OnActivityResult(SETTINGS)
     void startActivityForResult(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            boolean needReload = data.getBooleanExtra(NEED_RELOAD, true);
+            boolean needReload = data.getBooleanExtra(SettingsActivity.NEED_RELOAD, true);
             if (needReload) {
                 finish();
                 MapActivity_.intent(this).start();

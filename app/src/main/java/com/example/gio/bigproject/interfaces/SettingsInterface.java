@@ -1,5 +1,6 @@
-package com.example.gio.bigproject;
+package com.example.gio.bigproject.interfaces;
 
+import com.example.gio.bigproject.R;
 import com.example.gio.bigproject.activities.MapActivity;
 
 import org.androidannotations.annotations.sharedpreferences.DefaultInt;

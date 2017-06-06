@@ -3,6 +3,7 @@ package com.example.gio.bigproject.datas;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Copyright by Gio.
@@ -10,9 +11,9 @@ import java.util.ArrayList;
  */
 
 public class CarriagePolyline {
-    private static final ArrayList<LatLng> mCarriagePoly = new ArrayList<>();
+    private static final List<LatLng> mCarriagePoly = new ArrayList<>();
 
-    public static ArrayList<LatLng> getCarriagePoly1() {
+    public static List<LatLng> getCarriagePoly1() {
         if (mCarriagePoly.size() > 0) {
             mCarriagePoly.clear();
         }
@@ -51,7 +52,7 @@ public class CarriagePolyline {
         return mCarriagePoly;
     }
 
-    public static ArrayList<LatLng> getCarriagePoly2() {
+    public static List<LatLng> getCarriagePoly2() {
         if (mCarriagePoly.size() > 0) {
             mCarriagePoly.clear();
         }
@@ -69,7 +70,7 @@ public class CarriagePolyline {
         return  mCarriagePoly;
     }
 
-    public static ArrayList<LatLng> getCarriagePoly3() {
+    public static List<LatLng> getCarriagePoly3() {
         if (mCarriagePoly.size() > 0) {
             mCarriagePoly.clear();
         }
@@ -107,8 +108,8 @@ public class CarriagePolyline {
         return mCarriagePoly;
     }
 
-    private static ArrayList<LatLng> decodePoly(String encoded) {
-        ArrayList<LatLng> poly = new ArrayList<>();
+    private static List<LatLng> decodePoly(String encoded) {
+        List<LatLng> poly = new ArrayList<>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
         while (index < len) {

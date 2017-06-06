@@ -2,13 +2,12 @@ package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.SettingsInterface_;
+import com.example.gio.bigproject.interfaces.SettingsInterface_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -24,32 +23,20 @@ import java.util.Objects;
  */
 @EActivity(R.layout.activity_settings)
 public class SettingsActivity extends AppCompatActivity {
+    public static final String NEED_RELOAD = "needReload";
     private static final String MAP_VIEW_TYPE_TRAFFIC = "Traffic";
     @ViewById(R.id.radioGroupMode)
-    RadioGroup rdGroupMode;
-    @ViewById(R.id.rbWalking)
-    RadioButton rbWalking;
-    @ViewById(R.id.rbBicycle)
-    RadioButton rbBicycle;
-    @ViewById(R.id.rbMotor)
-    RadioButton rbMotor;
-    @ViewById(R.id.rbCar)
-    RadioButton rbCar;
-
+    RadioGroup mRdGroupMode;
     @ViewById(R.id.radioGroupType)
-    RadioGroup rdGroupType;
-    @ViewById(R.id.btnOk)
-    Button btnOk;
-    @ViewById(R.id.btnCancel)
-    Button btnCancel;
+    RadioGroup mRdGroupType;
 
     @Pref
-    SettingsInterface_ settingsInterface;
+    SettingsInterface_ mSettingsInterface;
 
     @AfterViews
     void afterViews() {
-        rdGroupMode.check(settingsInterface.checkedModeType().get());
-        rdGroupType.check(settingsInterface.checkedViewType().get());
+        mRdGroupMode.check(mSettingsInterface.checkedModeType().get());
+        mRdGroupType.check(mSettingsInterface.checkedViewType().get());
     }
 
     @Click(R.id.btnCancel)
@@ -65,10 +52,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     // Called when user press Save button
     private void saveSettings() {
-        int checkedRbModeId = rdGroupMode.getCheckedRadioButtonId();
+        int checkedRbModeId = mRdGroupMode.getCheckedRadioButtonId();
         RadioButton rbCheckedMode = (RadioButton) findViewById(checkedRbModeId);
 
-        int checkedRbTypeId = rdGroupType.getCheckedRadioButtonId();
+        int checkedRbTypeId = mRdGroupType.getCheckedRadioButtonId();
         RadioButton rbCheckedType = (RadioButton) findViewById(checkedRbTypeId);
         int type;
         if (Objects.equals(rbCheckedType.getText().toString(), MAP_VIEW_TYPE_TRAFFIC)) {
@@ -76,22 +63,22 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             type = 2;
         }
-        settingsInterface.edit()
+        mSettingsInterface.edit()
                 .checkedModeType()
-                .put(rdGroupMode.getCheckedRadioButtonId())
+                .put(mRdGroupMode.getCheckedRadioButtonId())
                 .mode()
                 .put(rbCheckedMode.getText().toString())
                 .type()
                 .put(type)
                 .checkedViewType()
-                .put(rdGroupType.getCheckedRadioButtonId())
+                .put(mRdGroupType.getCheckedRadioButtonId())
                 .apply();
         Toast.makeText(this, "Settings saved!", Toast.LENGTH_LONG).show();
     }
 
     private void reloadMap() {
         Intent data = new Intent();
-        data.putExtra(MapActivity.NEED_RELOAD, true);
+        data.putExtra(NEED_RELOAD, true);
         this.setResult(RESULT_OK, data);
         finish();
     }

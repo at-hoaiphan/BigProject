@@ -1,7 +1,6 @@
 package com.example.gio.bigproject.activities;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +17,7 @@ import com.example.gio.bigproject.models.bus_stops.PlaceStop;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -33,35 +33,33 @@ public class ListBusStopActivity extends AppCompatActivity  {
     static final String DEFAULT_CARRIAGE = "0";
     static final String ID_CARRIAGE = "idCarriage";
     static final String ID_PLACE = "idPlace";
+
+    @Extra("Carriage")
+    String carriage;
+
     @ViewById(R.id.rvPlaces)
     RecyclerView mRecyclerView;
 
-    @ViewById(R.id.fabBack)
-    FloatingActionButton fabBack;
-
-    @ViewById(R.id.spBusCarriage)
-    Spinner spBusCarriage;
+    @ViewById(R.id.spnBusCarriage)
+    Spinner mSpnBusCarriage;
 
     private ListBusStopAdapter mAdapter;
-    //    private SOServiceBus mService;
-    private BusStopDatabase busStopDatabase;
+    private BusStopDatabase mBusStopDatabase;
     private ArrayList<PlaceStop> mPlaceStops;
-
-//    private ArrayList<Result> mResults = new ArrayList<>();
 
     @AfterViews
     void afterViews() {
-        String carriage = getIntent().getStringExtra("Carriage");
+//        String carriage = getIntent().getStringExtra("Carriage");
         if (carriage != null) {
-            spBusCarriage.setSelection(Integer.parseInt(carriage));
+            mSpnBusCarriage.setSelection(Integer.parseInt(carriage));
         }
 //        mAdapter = new ListBusStopAdapter(mResults);
-        busStopDatabase = new BusStopDatabase(this);
+        mBusStopDatabase = new BusStopDatabase(this);
         mPlaceStops = new ArrayList<>();
         if (Objects.equals(carriage, DEFAULT_CARRIAGE)) {
-            mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+            mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
         } else {
-            mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(carriage));
+            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(carriage));
         }
         mAdapter = new ListBusStopAdapter(mPlaceStops);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -71,14 +69,14 @@ public class ListBusStopActivity extends AppCompatActivity  {
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
 
-        spBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSpnBusCarriage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mPlaceStops.clear();
                 if (i == 0) {
-                    mPlaceStops.addAll(busStopDatabase.getAllPlaces());
+                    mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
                 } else {
-                    mPlaceStops.addAll(busStopDatabase.getPlacesByIdCarriage(String.valueOf(spBusCarriage.getSelectedItemPosition())));
+                    mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(String.valueOf(mSpnBusCarriage.getSelectedItemPosition())));
                 }
                 mAdapter.notifyDataSetChanged();
             }
@@ -94,7 +92,7 @@ public class ListBusStopActivity extends AppCompatActivity  {
             @Override
             public void onPlaceClick(int id) {
                 Intent data = new Intent();
-                data.putExtra(ID_CARRIAGE, String.valueOf(spBusCarriage.getSelectedItemPosition()));
+                data.putExtra(ID_CARRIAGE, String.valueOf(mSpnBusCarriage.getSelectedItemPosition()));
                 data.putExtra(ID_PLACE, id);
                 setResult(RESULT_OK, data);
                 finish();

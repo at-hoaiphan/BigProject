@@ -6,8 +6,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.gio.bigproject.R;
-import com.example.gio.bigproject.SettingsInterface_;
 import com.example.gio.bigproject.activities.MapActivity;
+import com.example.gio.bigproject.interfaces.SettingsInterface_;
 import com.example.gio.bigproject.models.bus_stops.PlaceStop;
 
 import org.androidannotations.annotations.AfterViews;
@@ -34,7 +34,6 @@ public class ViewPagerMarker extends Fragment {
 
     @Pref
     SettingsInterface_ mSettingsInterface;
-//    private String referencePhotoLink = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=";
 
     public ViewPagerMarker() {
     }

@@ -1,11 +1,11 @@
 package com.example.gio.bigproject.datas;
 
-import android.util.Log;
-
+import com.example.gio.bigproject.interfaces.SOServiceBus;
 import com.example.gio.bigproject.models.bus_stops.Result;
 import com.example.gio.bigproject.models.bus_stops.SOStationsResponse;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -16,10 +16,11 @@ import retrofit2.Response;
  * Created on 4/14/2017.
  */
 
+// Get data from service
 class MockData {
 
     // Get Data from service
-    private static final ArrayList<Result> mResults = new ArrayList<>();
+    private static final List<Result> mResults = new ArrayList<>();
     // Get data from Json
     private static SOServiceBus mService = ApiUtilsBus.getSOService();
     private static int RESULT_COUNT;
@@ -46,7 +47,7 @@ class MockData {
 
     }
 
-    public static ArrayList<Result> getData() {
+    public static List<Result> getData() {
         return mResults;
     }
 }

@@ -1,5 +1,8 @@
 package com.example.gio.bigproject.datas;
 
+import com.example.gio.bigproject.interfaces.SOServiceBus;
+import com.example.gio.bigproject.interfaces.SOServiceDirection;
+
 /**
  * Copyright by Gio.
  * Created on 4/5/2017.

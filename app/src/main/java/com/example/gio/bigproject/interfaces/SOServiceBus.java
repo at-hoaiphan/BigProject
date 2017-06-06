@@ -1,4 +1,4 @@
-package com.example.gio.bigproject.datas;
+package com.example.gio.bigproject.interfaces;
 
 import com.example.gio.bigproject.models.bus_stops.SOStationsResponse;
 
@@ -11,7 +11,7 @@ import retrofit2.http.Query;
  * Created on 4/5/2017.
  */
 
-interface SOServiceBus {
+public interface SOServiceBus {
 
     @GET("place/textsearch/json")
     Call<SOStationsResponse> getBusStop(@Query("query") String query, @Query("location") String location, @Query("key") String KEY);
