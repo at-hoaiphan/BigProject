@@ -64,8 +64,7 @@ public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position)
     PlaceStop item = mItems.get(position);
     TextView tvLatLongStation = holder.tvLatLongStation;
     TextView tvNameStation = holder.tvNameStation;
-    tvLatLongStation.setText(String.valueOf(item.getLatitude()) + ";"
-            + String.valueOf(item.getLongitude()));
+    tvLatLongStation.setText(String.valueOf(item.getLatitude()) + ";" + String.valueOf(item.getLongitude()));
     tvNameStation.setText(item.getName());
 
     holder.imgStation.setImageResource(R.drawable.ic_bus_stop);

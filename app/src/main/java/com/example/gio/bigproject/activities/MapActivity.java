@@ -34,6 +34,7 @@ import com.example.gio.bigproject.datas.CarriagePolyline;
 import com.example.gio.bigproject.interfaces.SOServiceDirection;
 import com.example.gio.bigproject.interfaces.SettingsInterface_;
 import com.example.gio.bigproject.models.bus_stops.PlaceStop;
+import com.example.gio.bigproject.models.directions.Legs;
 import com.example.gio.bigproject.models.directions.RouteDirec;
 import com.example.gio.bigproject.models.directions.SOPlacesDirectionResponse;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -99,17 +100,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final String CAR = "car";
     public static final String WALKING = "walking";
     public static String positionCarriage;
-
-    @Extra("Carriage")
-    String mCarriage;
-    @ViewById(R.id.viewpagerLocation)
-    ViewPager mViewPager;
-
-    @ViewById(R.id.spBusCarriage)
-    Spinner mSpinnerBusCarriage;
-
-    @Pref
-    SettingsInterface_ mSettingsInterface;
+    private static boolean isViewpagerVisibility;
+    private static boolean isDirected;
 
     private SOServiceDirection mSoServiceDirection;
     private List<Marker> mListMarkers = new ArrayList<>();
@@ -125,10 +117,17 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker mMovingMarker;
     private Marker mBusMarker;
     private ViewPagerMarkerAdapter mAdapter;
-    private static boolean isViewpagerVisibility = false;
-    private static boolean isDirected = false;
     private CountDownTimer mCountDownTimer;
     private List<PlaceStop> mPlaceStops = new ArrayList<>();
+
+    @Extra("Carriage")
+    String mCarriage;
+    @ViewById(R.id.viewpagerLocation)
+    ViewPager mViewPager;
+    @ViewById(R.id.spBusCarriage)
+    Spinner mSpinnerBusCarriage;
+    @Pref
+    SettingsInterface_ mSettingsInterface;
 
     @AfterViews
     void afterViews() {
@@ -658,36 +657,38 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     }
 
     private void loadDirections(final int position) {
-        try { mSoServiceDirection.getPlacesDirection(String.valueOf(mCurrentMarker.getPosition().latitude)
-                        + "," + String.valueOf(mCurrentMarker.getPosition().longitude),
-                mListMarkers.get(position).getPosition().latitude
-                        + "," + mListMarkers.get(position).getPosition().longitude,
-                mSettingsInterface.mode().get().toLowerCase(),
-                ApiUtilsBus.KEY)
-                .enqueue(new Callback<SOPlacesDirectionResponse>() {
-                    @Override
-                    public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+        try {
+            mSoServiceDirection.getPlacesDirection(String.valueOf(mCurrentMarker.getPosition().latitude)
+                            + "," + String.valueOf(mCurrentMarker.getPosition().longitude),
+                    mListMarkers.get(position).getPosition().latitude
+                            + "," + mListMarkers.get(position).getPosition().longitude,
+                    mSettingsInterface.mode().get().toLowerCase(),
+                    ApiUtilsBus.KEY)
+                    .enqueue(new Callback<SOPlacesDirectionResponse>() {
+                        @Override
+                        public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
 
-                        if (response.isSuccessful()) {
-                            mRoutes.clear();
-                            mRoutes.addAll(response.body().getRoutes());
+                            if (response.isSuccessful()) {
+                                mRoutes.clear();
+                                mRoutes.addAll(response.body().getRoutes());
 
-                            // Display distance and duration of Destination
-                            if (mRoutes.size() > 0) {
-                                mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-                                        + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
-                                mListMarkers.get(position).showInfoWindow();
+                                // Display distance and duration of Destination
+                                if (mRoutes.size() > 0) {
+                                    Legs leg = mRoutes.get(0).getLegs().get(0);
+                                    mListMarkers.get(position).setSnippet(leg.getDistance().getText()
+                                            + "; " + leg.getDuration().getText());
+                                    mListMarkers.get(position).showInfoWindow();
+                                }
+                            } else {
+                                Toast.makeText(MapActivity.this, LOAD_ROUTES_FAILED, Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(MapActivity.this, LOAD_ROUTES_FAILED, Toast.LENGTH_SHORT).show();
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-                        Toast.makeText(MapActivity.this, LOAD_DIRECTIONS_FAILED, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+                            Toast.makeText(MapActivity.this, LOAD_DIRECTIONS_FAILED, Toast.LENGTH_SHORT).show();
+                        }
+                    });
         } catch (Exception e) {
             Toast.makeText(this, REQUEST_DIRECTION_ERROR, Toast.LENGTH_SHORT).show();
         }
@@ -708,7 +709,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
                             if (response.isSuccessful()) {
                                 // Display dduration of Remaining time
-                                if (mRoutes.size() > 0) {
+                                if (response.body() != null) {
                                     String distanceDuration = mListMarkers.get(position).getSnippet();
                                     mListMarkers.get(position).setSnippet(distanceDuration
                                             + " - remain: " + response.body().getRoutes().get(0).getLegs().get(0).getDuration().getText());

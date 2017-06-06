@@ -22,7 +22,7 @@ import java.util.Objects;
  * Created on 4/14/2017.
  */
 
-@EFragment(R.layout.google_map_detail_marker)
+@EFragment(R.layout.fragment_google_map_detail_marker)
 public class ViewPagerMarker extends Fragment {
     private static final String OBJECT = "object";
     @ViewById(R.id.tvMarkerTitle)
@@ -53,7 +53,7 @@ public class ViewPagerMarker extends Fragment {
     }
 
     public ViewPagerMarker newInstance(PlaceStop placeStop) {
-        ViewPagerMarker fragment = new ViewPagerMarker();
+        ViewPagerMarker fragment = new ViewPagerMarker_();
         Bundle bundle = new Bundle();
         bundle.putParcelable(OBJECT, placeStop);
         fragment.setArguments(bundle);

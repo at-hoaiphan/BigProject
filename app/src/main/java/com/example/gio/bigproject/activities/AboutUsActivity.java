@@ -12,7 +12,7 @@ import org.androidannotations.annotations.EActivity;
  * Created on 5/16/2017.
  */
 
-@EActivity(R.layout.about_us)
+@EActivity(R.layout.activity_about_us)
 public class AboutUsActivity extends AppCompatActivity {
     @Click(R.id.fabBack)
     void clickBack() {
