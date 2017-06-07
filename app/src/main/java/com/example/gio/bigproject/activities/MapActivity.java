@@ -78,27 +78,13 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final int LIST_PLACES = 88;
     public static final int MAP_TYPE_NORMAL = 1;
     public static final int MAP_TYPE_SATELLITE = 2;
-    public static final String CHECK_CHOOSE_DESTINATION = "Please choose your destination!";
-    public static final String CHECK_NETWORK = "No internet, please check your network!";
-    public static final String LOAD_DATA_FAILED = "Load data failed!";
-    public static final String PERMISSION_GRANTED = "Permission granted!";
-    public static final String PERMISSION_DENIED = "Permission denied!";
-    public static final String NO_LOCATION_PROVIDER = "No location provider enabled!";
-    public static final String SHOW_LOCATION_ERROR = "Show your location error!";
-    public static final String MY_LOCATION = "My Location!";
-    public static final String BUS_HERE = "Bus here!";
-    public static final String ERROR = "Error!";
-    public static final String LOAD_ROUTES_FAILED = "Routes didn't load from API, please check internet and restart app again!";
-    public static final String LOAD_DIRECTIONS_FAILED = "Load Direction PlaceStop failed from API, please check internet and restart app again!";
-    public static final String REQUEST_DIRECTION_ERROR = "Request directions from Google error!";
-    public static final String LOAD_TIME_REMAIN_FAILED = "Load remain time failed from API, please check internet and restart app again!";
     public static final String DEFAULT_CARRIAGE = "0";
     public static final String CARRIAGE_1 = "1";
     public static final String CARRIAGE_2 = "2";
     public static final String CARRIAGE_3 = "3";
     public static final String CAR = "car";
     public static final String WALKING = "walking";
-    public static String positionCarriage;
+    public static String sPositionCarriage;
 
     @Extra("Carriage")
     String mCarriage;
@@ -125,8 +111,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker mMovingMarker;
     private Marker mBusMarker;
     private ViewPagerMarkerAdapter mAdapter;
-    private static boolean isViewpagerVisibility = false;
-    private static boolean isDirected = false;
+    private static boolean mIsViewpagerVisibility = false;
+    private static boolean mIsDirected = false;
     private CountDownTimer mCountDownTimer;
     private List<PlaceStop> mPlaceStops = new ArrayList<>();
 
@@ -135,12 +121,12 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 //        // Request data from server
 //        MockData.createData();
 
-        positionCarriage = String.valueOf(mSpinnerBusCarriage.getSelectedItemPosition());
+        sPositionCarriage = String.valueOf(mSpinnerBusCarriage.getSelectedItemPosition());
         mSoServiceDirection = ApiUtilsBus.getSOServiceDirection();
         // Create Progress Bar
         mMyProgress = new ProgressDialog(this);
-        mMyProgress.setTitle("Map Loading ...");
-        mMyProgress.setMessage("Please wait...");
+        mMyProgress.setTitle(R.string.title_dialog_map_loading);
+        mMyProgress.setMessage(getString(R.string.message_dialog_please_wait));
         mMyProgress.setCancelable(true);
 
         // Display Progress Bar
@@ -176,15 +162,15 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @OptionsItem(R.id.mnExit)
     void selectExitItem() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Message");
-        builder.setMessage("Do you want to quit app?")
+        builder.setTitle(R.string.title_dialog_message);
+        builder.setMessage(R.string.message_dialog_confirm_quit_app)
                 .setCancelable(false)
-                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.button_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogInterface, int id) {
                         finish();
                     }
                 })
-                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.button_dialog_cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -197,8 +183,8 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     void clickFabFindDirec() {
         try {
             if (isOnline()) {
-                if (isViewpagerVisibility) {
-                    isDirected = true;
+                if (mIsViewpagerVisibility) {
+                    mIsDirected = true;
                     // points: overview_polyline
                     List<LatLng> arrDecode = decodePoly(mRoutes.get(0).getOverViewPolyline().getPoints());
                     // Draw polylines
@@ -220,22 +206,19 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     }
                     mPolyline = mMyMap.addPolyline(polyOp);
                 } else {
-                    Toast.makeText(this, CHECK_CHOOSE_DESTINATION, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.text_message_check_choose_destination, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(this, CHECK_NETWORK, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.text_message_check_network, Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, ERROR, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_message_error, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Click(R.id.fabListBusStops)
     void clickListButton() {
-        ListBusStopActivity_.intent(this).mCarriage(positionCarriage).startForResult(LIST_PLACES);
-//        Intent intent = new Intent(this, ListBusStopActivity_.class);
-//        intent.putExtra(CARRIAGE, positionCarriage);
-//        startActivityForResult(intent, LIST_PLACES);
+        ListBusStopActivity_.intent(this).mCarriage(sPositionCarriage).startForResult(LIST_PLACES);
     }
 
     private void onMyMapReady(final GoogleMap googleMap) {
@@ -246,32 +229,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             @Override
             public void onMapLoaded() {
                 mViewPager.setVisibility(View.GONE);
-                isViewpagerVisibility = false;
+                mIsViewpagerVisibility = false;
 
                 // Dismiss Dialog Progress when downloading finished
                 mMyProgress.dismiss();
-
-                // Add Detail location
-                // Add marker
-//                mResults = MockData.getData();
-//                if (mResults.size() > 0) {
-//                    for (int i = 0; i < mResults.size(); i++) {
-//                        MarkerOptions option = new MarkerOptions();
-//                        option.title(mResults.get(i).getName());
-//                        option.snippet(mResults.get(i).getGeometry().getLocation().getLat()
-//                                + ";" + mResults.get(i).getGeometry().getLocation().getLng());
-//                        option.position(new LatLng(mResults.get(i).getGeometry().getLocation().getLat(),
-//                                mResults.get(i).getGeometry().getLocation().getLng()));
-//                        option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
-//                        Marker marker = myMap.addMarker(option);
-//                        mListMarkers.add(marker);
-//                        marker.showInfoWindow();
-//                    }
-//
-//                } else {
-//                    Toast.makeText(getBaseContext(), "Load API failed, Please restart app again!", Toast.LENGTH_SHORT).show();
-//                }
-
                 // Get data from database
                 mBusStopDatabase = new BusStopDatabase(getBaseContext());
                 if (mSpinnerBusCarriage.getSelectedItemPosition() == 0) {
@@ -295,7 +256,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     }
 
                 } else {
-                    Toast.makeText(getBaseContext(), LOAD_DATA_FAILED, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.error_message_load_data_fail, Toast.LENGTH_SHORT).show();
                 }
 
                 // Draw all carriage
@@ -305,18 +266,18 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         mViewPager.setVisibility(View.GONE);
-                        isViewpagerVisibility = false;
+                        mIsViewpagerVisibility = false;
 
-                        positionCarriage = String.valueOf(i);
+                        sPositionCarriage = String.valueOf(i);
                         // Reload map
                         mMyMap.clear();
-                        isDirected = false;
+                        mIsDirected = false;
 
                         // draw carriage
-                        if (Objects.equals(positionCarriage, String.valueOf(0))) {
+                        if (Objects.equals(sPositionCarriage, String.valueOf(0))) {
                             drawAllCarriagePoly();
                         } else {
-                            drawCarriagePoly(positionCarriage);
+                            drawCarriagePoly(sPositionCarriage);
                         }
 
                         // Remove previousSelectedMarker
@@ -327,10 +288,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         showMyLocation();
                         mListMarkers.clear();
                         mPlaceStops.clear();
-                        if (Objects.equals(positionCarriage, String.valueOf(0))) {
+                        if (Objects.equals(sPositionCarriage, String.valueOf(0))) {
                             mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
                         } else {
-                            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage));
+                            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(sPositionCarriage));
                         }
 
                         if (mPlaceStops.size() > 0) {
@@ -347,8 +308,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         mViewPager.setAdapter(null);
                         mAdapter = new ViewPagerMarkerAdapter(getBaseContext(), getSupportFragmentManager(), mPlaceStops);
                         mViewPager.setAdapter(mAdapter);
-
-
                     }
 
                     @Override
@@ -357,12 +316,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     }
                 });
 
-
                 mMyMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         mViewPager.setVisibility(View.VISIBLE);
-                        isViewpagerVisibility = true;
+                        mIsViewpagerVisibility = true;
                         if (mPreviousSelectedMarker != null) {
                             try {
                                 mPreviousSelectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop24));
@@ -435,14 +393,14 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(this, PERMISSION_GRANTED, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.text_message_permission_grandted, Toast.LENGTH_LONG).show();
 
                     // Display current location.
                     this.showMyLocation();
                 }
                 // Cancel or refuse.
                 else {
-                    Toast.makeText(this, PERMISSION_DENIED, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.text_message_permission_denied, Toast.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -460,7 +418,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         boolean enabled = locationManager.isProviderEnabled(bestProvider);
 
         if (!enabled) {
-            Toast.makeText(this, NO_LOCATION_PROVIDER, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.no_location_provider, Toast.LENGTH_LONG).show();
             return null;
         }
         return bestProvider;
@@ -494,7 +452,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
         // Android API >= 23 catch SecurityException.
         catch (SecurityException e) {
-            Toast.makeText(this, SHOW_LOCATION_ERROR, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.error_message_show_location_error, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -503,7 +461,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             mMyMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             // Add MyLocation on Map:
             MarkerOptions option = new MarkerOptions();
-            option.title(MY_LOCATION);
+            option.title(getString(R.string.title_marker_my_location));
             option.snippet(latLng.latitude + "+" + latLng.longitude);
             option.position(new LatLng(latLng.latitude, latLng.longitude));
             option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_marker));
@@ -517,8 +475,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     .bearing(90)                // Sets the orientation of the camera to east
                     .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
-//            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
 
             mMyMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
@@ -530,7 +486,6 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         mCurrentMarker.remove();
                     }
                     showMyLocation();
-//                    mPolyline.remove();
                     if (mViewPager.getVisibility() == View.VISIBLE) {
                         loadDirections(mViewPager.getCurrentItem());
                     }
@@ -556,14 +511,14 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
                     mCurrentMarker.setSnippet(marker.getPosition().latitude + "; " + marker.getPosition().longitude);
-                    Toast.makeText(MapActivity.this, "Set your loacation latitude-longitude: "
+                    Toast.makeText(MapActivity.this, getString(R.string.text_message_set_latlng)
                             + marker.getPosition().latitude
                             + marker.getPosition().longitude, Toast.LENGTH_SHORT).show();
                     loadDirections(mViewPager.getCurrentItem());
                 }
             });
         } else {
-            Toast.makeText(this, "Load Location via GPS failed! Loading via network...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.text_message_load_gps_via_network, Toast.LENGTH_LONG).show();
             try {
                 if (ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -581,7 +536,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                         locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
                 // Load Location via NetWork Provider
                 MarkerOptions option = new MarkerOptions();
-                option.title(MY_LOCATION);
+                option.title(getString(R.string.title_marker_my_location));
                 option.snippet(locationNet.latitude + "; " + locationNet.longitude);
                 option.position(locationNet);
                 option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_start_marker));
@@ -603,14 +558,14 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mMyMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (isDirected) {
+                if (mIsDirected) {
                     LatLng previousLatLngMoving = new LatLng(0, 0);
                     if (mMovingMarker != null) {
                         previousLatLngMoving = new LatLng(mMovingMarker.getPosition().latitude, mMovingMarker.getPosition().longitude);
                         mMovingMarker.remove();
                     }
                     MarkerOptions option = new MarkerOptions();
-                    option.title(MY_LOCATION);
+                    option.title(getString(R.string.title_marker_my_location));
                     option.position(new LatLng(location.getLatitude(), location.getLongitude()));
                     option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_placeholder));
                     mMovingMarker = mMyMap.addMarker(option);
@@ -636,7 +591,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         // Clear old direction
         if (mPolyline != null) {
             mPolyline.remove();
-            isDirected = false;
+            mIsDirected = false;
         }
         loadDirections(position);
         loadTimeRemain(position);
@@ -658,38 +613,39 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     }
 
     private void loadDirections(final int position) {
-        try { mSoServiceDirection.getPlacesDirection(String.valueOf(mCurrentMarker.getPosition().latitude)
-                        + "," + String.valueOf(mCurrentMarker.getPosition().longitude),
-                mListMarkers.get(position).getPosition().latitude
-                        + "," + mListMarkers.get(position).getPosition().longitude,
-                mSettingsInterface.mode().get().toLowerCase(),
-                ApiUtilsBus.KEY)
-                .enqueue(new Callback<SOPlacesDirectionResponse>() {
-                    @Override
-                    public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
+        try {
+            mSoServiceDirection.getPlacesDirection(String.valueOf(mCurrentMarker.getPosition().latitude)
+                            + "," + String.valueOf(mCurrentMarker.getPosition().longitude),
+                    mListMarkers.get(position).getPosition().latitude
+                            + "," + mListMarkers.get(position).getPosition().longitude,
+                    mSettingsInterface.mode().get().toLowerCase(),
+                    ApiUtilsBus.KEY)
+                    .enqueue(new Callback<SOPlacesDirectionResponse>() {
+                        @Override
+                        public void onResponse(Call<SOPlacesDirectionResponse> call, Response<SOPlacesDirectionResponse> response) {
 
-                        if (response.isSuccessful()) {
-                            mRoutes.clear();
-                            mRoutes.addAll(response.body().getRoutes());
+                            if (response.isSuccessful()) {
+                                mRoutes.clear();
+                                mRoutes.addAll(response.body().getRoutes());
 
-                            // Display distance and duration of Destination
-                            if (mRoutes.size() > 0) {
-                                mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
-                                        + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
-                                mListMarkers.get(position).showInfoWindow();
+                                // Display distance and duration of Destination
+                                if (mRoutes.size() > 0) {
+                                    mListMarkers.get(position).setSnippet(mRoutes.get(0).getLegs().get(0).getDistance().getText()
+                                            + "; " + mRoutes.get(0).getLegs().get(0).getDuration().getText());
+                                    mListMarkers.get(position).showInfoWindow();
+                                }
+                            } else {
+                                Toast.makeText(MapActivity.this, R.string.error_message_load_routes_failed, Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(MapActivity.this, LOAD_ROUTES_FAILED, Toast.LENGTH_SHORT).show();
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-                        Toast.makeText(MapActivity.this, LOAD_DIRECTIONS_FAILED, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
+                            Toast.makeText(MapActivity.this, R.string.error_message_load_direction_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    });
         } catch (Exception e) {
-            Toast.makeText(this, REQUEST_DIRECTION_ERROR, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_message_request_direction_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -715,23 +671,23 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                                     mListMarkers.get(position).showInfoWindow();
                                 }
                             } else {
-                                Toast.makeText(MapActivity.this, LOAD_TIME_REMAIN_FAILED, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MapActivity.this, R.string.error_message_load_time_remain_failed, Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<SOPlacesDirectionResponse> call, Throwable t) {
-                            Toast.makeText(MapActivity.this, LOAD_TIME_REMAIN_FAILED, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MapActivity.this, R.string.error_message_load_time_remain_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
         } catch (Exception e) {
-            Toast.makeText(this, REQUEST_DIRECTION_ERROR, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_message_request_direction_error, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadMap() {
         mMyMap.clear();
-        isDirected = false;
+        mIsDirected = false;
         if (mPreviousSelectedMarker != null) {
             mPreviousSelectedMarker.remove();
         }
@@ -740,10 +696,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mPlaceStops.clear();
 
         // Draw Carriage
-        if (Objects.equals(positionCarriage, DEFAULT_CARRIAGE)) {
+        if (Objects.equals(sPositionCarriage, DEFAULT_CARRIAGE)) {
             mPlaceStops.addAll(mBusStopDatabase.getAllPlaces());
         } else {
-            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(positionCarriage));
+            mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(sPositionCarriage));
         }
         if (mPlaceStops.size() > 0) {
             for (PlaceStop placeStop : mPlaceStops) {
@@ -787,11 +743,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             mCountDownTimer.cancel();
         }
         MarkerOptions option = new MarkerOptions();
-        option.title(BUS_HERE);
+        option.title(getString(R.string.title_marker_bus_here));
         option.position(new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude));
         option.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_marker));
         mBusMarker = mMyMap.addMarker(option);
-//                busMarker.showInfoWindow();
         mCountDownTimer = new CountDownTimer((arrCarriageDecode.size()) * 5000, 5000) {
             int index = 0;
             LatLng busPosition = new LatLng(arrCarriageDecode.get(0).latitude, arrCarriageDecode.get(0).longitude);
@@ -910,19 +865,19 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     @OnActivityResult(LIST_PLACES)
     void startActivityForResultList(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (!Objects.equals(positionCarriage, data.getStringExtra(ListBusStopActivity.ID_CARRIAGE))) {
-                positionCarriage = data.getStringExtra(ListBusStopActivity.ID_CARRIAGE);
+            if (!Objects.equals(sPositionCarriage, data.getStringExtra(ListBusStopActivity.ID_CARRIAGE))) {
+                sPositionCarriage = data.getStringExtra(ListBusStopActivity.ID_CARRIAGE);
                 loadMap();
-                if (Objects.equals(positionCarriage, DEFAULT_CARRIAGE)) {
+                if (Objects.equals(sPositionCarriage, DEFAULT_CARRIAGE)) {
                     drawAllCarriagePoly();
                 } else {
-                    drawCarriagePoly(positionCarriage);
+                    drawCarriagePoly(sPositionCarriage);
                 }
             }
             int idPlace = data.getIntExtra(ListBusStopActivity.ID_PLACE, -1);
             if (idPlace != -1) {
                 mViewPager.setVisibility(View.VISIBLE);
-                isViewpagerVisibility = true;
+                mIsViewpagerVisibility = true;
                 mViewPager.setCurrentItem(idPlace, true);
 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
