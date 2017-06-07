@@ -32,6 +32,32 @@
     <string name="address">Address</string>
     <string name="address_">Address:</string>
 
+    <string name="title.dialog.map_loading">Map Loading …</string>
+    <string name="title.dialog.message">Message</string>
+    <string name="title.marker.my_location">My Location!</string>
+    <string name="title.marker.bus_here">Bus here!</string>
+    <string name="button.dialog.ok">OK</string>
+    <string name="button.dialog.cancel">Cancel</string>
+    <string name="message.dialog.please_wait">Please wait…</string>
+    <string name="message.dialog.confirm_quit_app">Do you want to quit app?</string>
+    <string name="text.message.check_choose_destination">Please choose your destination!</string>
+    <string name="text.message.check_network">No internet, please check your network!</string>
+    <string name="text.message.permission_grandted">Permission granted!</string>
+    <string name="text.message.permission_denied">Permission denied!</string>
+    <string name="text.message.set_latlng">Set your location latitude-longitude: </string>
+    <string name="text.message.load_gps_via_network">Load Location via GPS failed! Loading via network…</string>
+    <string name="text.message.settings_save">Settings save!</string>
+    <string name="text.message.initial_database">Initial database is created!</string>
+    <string name="error.message.load_data_fail">Load data failed!</string>
+    <string name="error.message.no_location_provider">No location provider enabled!</string>
+    <string name="error.message.show_location_error">Show your location error!</string>
+    <string name="error.message.error">Error!</string>
+    <string name="error.message.load_routes_failed">Routes did not load from API, please check internet and restart app again!</string>
+    <string name="error.message.load_direction_failed">Load Direction PlaceStop failed from API, please check internet and restart app again!</string>
+    <string name="error.message.request_direction_error">Request directions from Google error!</string>
+    <string name="error.message.load_time_remain_failed">Load remain time failed from API, please check internet and restart app again!</string>
+    <string name="error.message.error_copying_database">Error copying database!</string>
+
     <string-array name="carriages_array">
         <item>Tất cả</item>
         <item>Tuyến 1</item>

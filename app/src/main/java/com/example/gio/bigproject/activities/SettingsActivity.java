@@ -7,10 +7,13 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.gio.bigproject.R;
+import com.example.gio.bigproject.interfaces.SettingsInterface_;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.Objects;
 
@@ -27,14 +30,14 @@ public class SettingsActivity extends AppCompatActivity {
     @ViewById(R.id.radioGroupType)
     RadioGroup mRdGroupType;
 
-//    @Pref
-//    SettingsInterface_ mSettingsInterface;
+    @Pref
+    SettingsInterface_ mSettingsInterface;
 
-//    @AfterViews
-//    void afterViews() {
-//        mRdGroupMode.check(mSettingsInterface.checkedModeType().get());
-//        mRdGroupType.check(mSettingsInterface.checkedViewType().get());
-//    }
+    @AfterViews
+    void afterViews() {
+        mRdGroupMode.check(mSettingsInterface.checkedModeType().get());
+        mRdGroupType.check(mSettingsInterface.checkedViewType().get());
+    }
 
     @Click(R.id.btnCancel)
     void clickBtnCancel() {
@@ -60,17 +63,17 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             type = 2;
         }
-//        mSettingsInterface.edit()
-//                .checkedModeType()
-//                .put(mRdGroupMode.getCheckedRadioButtonId())
-//                .mode()
-//                .put(rbCheckedMode.getText().toString())
-//                .type()
-//                .put(type)
-//                .checkedViewType()
-//                .put(mRdGroupType.getCheckedRadioButtonId())
-//                .apply();
-        Toast.makeText(this, "Settings saved!", Toast.LENGTH_LONG).show();
+        mSettingsInterface.edit()
+                .checkedModeType()
+                .put(mRdGroupMode.getCheckedRadioButtonId())
+                .mode()
+                .put(rbCheckedMode.getText().toString())
+                .type()
+                .put(type)
+                .checkedViewType()
+                .put(mRdGroupType.getCheckedRadioButtonId())
+                .apply();
+        Toast.makeText(this, R.string.text_message_settings_save, Toast.LENGTH_LONG).show();
     }
 
     private void reloadMap() {

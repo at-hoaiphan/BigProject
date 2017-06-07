@@ -19,13 +19,11 @@ import java.util.List;
  */
 
 public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.ViewHolder> {
-
-//    private List<Result> mItems;
+    //    private List<Result> mItems;
     private List<PlaceStop> mItems;
     private PlaceListener mPlaceListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
-
         TextView tvLatLongStation;
         TextView tvNameStation;
         ImageView imgStation;
@@ -58,18 +56,16 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         return new ViewHolder(postView);
     }
 
-@Override
-public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
+    @Override
+    public void onBindViewHolder(ListBusStopAdapter.ViewHolder holder, int position) {
+        PlaceStop item = mItems.get(position);
+        TextView tvLatLongStation = holder.tvLatLongStation;
+        TextView tvNameStation = holder.tvNameStation;
+        tvLatLongStation.setText(String.valueOf(item.getLatitude()) + ";" + String.valueOf(item.getLongitude()));
+        tvNameStation.setText(item.getName());
 
-    PlaceStop item = mItems.get(position);
-    TextView tvLatLongStation = holder.tvLatLongStation;
-    TextView tvNameStation = holder.tvNameStation;
-    tvLatLongStation.setText(String.valueOf(item.getLatitude()) + ";"
-            + String.valueOf(item.getLongitude()));
-    tvNameStation.setText(item.getName());
-
-    holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
-}
+        holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
+    }
 
     @Override
     public int getItemCount() {

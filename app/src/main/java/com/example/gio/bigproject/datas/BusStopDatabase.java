@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.example.gio.bigproject.R;
 import com.example.gio.bigproject.models.bus_stops.PlaceStop;
 
 import java.io.File;
@@ -45,9 +46,9 @@ public class BusStopDatabase extends SQLiteOpenHelper {
                 openDataBase();
 
             } catch (IOException e) {
-                throw new Error("Error copying database");
+                Toast.makeText(context, R.string.error_message_error_copying_database, Toast.LENGTH_LONG).show();
             }
-            Toast.makeText(context, "Initial database is created", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.text_message_initial_database, Toast.LENGTH_LONG).show();
         }
     }
 
