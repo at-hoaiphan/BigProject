@@ -5,6 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,13 +25,14 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
     //    private List<Result> mItems;
     private List<PlaceStop> mItems;
     private PlaceListener mPlaceListener;
+    private Context mContext;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvLatLongStation;
         TextView tvNameStation;
         ImageView imgStation;
 
-        ViewHolder(View itemView) {
+        ViewHolder(final View itemView) {
             super(itemView);
             tvLatLongStation = (TextView) itemView.findViewById(R.id.tvLatLong);
             tvNameStation = (TextView) itemView.findViewById(R.id.tvNameStation);
@@ -43,8 +47,14 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         }
     }
 
-    public ListBusStopAdapter(List<PlaceStop> posts) {
+    public ListBusStopAdapter(List<PlaceStop> posts, Context context) {
         mItems = posts;
+        mContext = context;
+    }
+
+    private void animate(RecyclerView.ViewHolder viewHolder) {
+        final Animation animAnticipateOvershoot = AnimationUtils.loadAnimation(mContext, R.anim.bounce_interpolator);
+        viewHolder.itemView.setAnimation(animAnticipateOvershoot);
     }
 
     @Override
@@ -65,6 +75,7 @@ public class ListBusStopAdapter extends RecyclerView.Adapter<ListBusStopAdapter.
         tvNameStation.setText(item.getName());
 
         holder.imgStation.setImageResource(R.drawable.ic_bus_stop);
+        animate(holder);
     }
 
     @Override
