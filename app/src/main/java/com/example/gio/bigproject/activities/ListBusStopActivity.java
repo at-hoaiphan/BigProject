@@ -63,7 +63,7 @@ public class ListBusStopActivity extends AppCompatActivity {
         } else {
             mPlaceStops.addAll(mBusStopDatabase.getPlacesByIdCarriage(mCarriage));
         }
-        mAdapter = new ListBusStopAdapter(mPlaceStops);
+        mAdapter = new ListBusStopAdapter(mPlaceStops, getBaseContext());
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);

@@ -418,7 +418,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         boolean enabled = locationManager.isProviderEnabled(bestProvider);
 
         if (!enabled) {
-            Toast.makeText(this, R.string.no_location_provider, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.error_message_no_location_provider, Toast.LENGTH_LONG).show();
             return null;
         }
         return bestProvider;
@@ -754,9 +754,11 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             public void onTick(long millisUntilFinished) {
                 if (index == arrCarriageDecode.size() - 1) {
                     cancel();
+                } else {
+                    index++;
+                    busPosition = new LatLng(arrCarriageDecode.get(index).latitude, arrCarriageDecode.get(index).longitude);
+                    mBusMarker.setPosition(busPosition);
                 }
-                busPosition = new LatLng(arrCarriageDecode.get(++index).latitude, arrCarriageDecode.get(++index).longitude);
-                mBusMarker.setPosition(busPosition);
             }
 
             public void onFinish() {

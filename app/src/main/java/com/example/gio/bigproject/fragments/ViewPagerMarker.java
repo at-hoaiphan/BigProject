@@ -53,7 +53,7 @@ public class ViewPagerMarker extends Fragment {
     }
 
     public ViewPagerMarker newInstance(PlaceStop placeStop) {
-        ViewPagerMarker fragment = new ViewPagerMarker();
+        ViewPagerMarker fragment = new ViewPagerMarker_();
         Bundle bundle = new Bundle();
         bundle.putParcelable(OBJECT, placeStop);
         fragment.setArguments(bundle);
