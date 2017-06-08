@@ -6,6 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -47,7 +51,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.SphericalUtil;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
@@ -69,7 +72,7 @@ import retrofit2.Response;
 
 @OptionsMenu(R.menu.menu_toolbar)
 @EActivity(R.layout.activity_main)
-public class MapActivity extends AppCompatActivity implements LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
+public class MapActivity extends AppCompatActivity implements SensorEventListener, LocationListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMarkerClickListener, ViewPager.OnPageChangeListener {
 
     // Request for location (***).
     // value 8bit (value < 256).
@@ -84,18 +87,22 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     public static final String CARRIAGE_3 = "3";
     public static final String CAR = "car";
     public static final String WALKING = "walking";
-    public static String sPositionCarriage;
 
     @Extra("Carriage")
     String mCarriage;
     @ViewById(R.id.viewpagerLocation)
     ViewPager mViewPager;
-
     @ViewById(R.id.spBusCarriage)
     Spinner mSpinnerBusCarriage;
-
     @Pref
     SettingsInterface_ mSettingsInterface;
+
+    public static String sPositionCarriage;
+    private static boolean mIsViewpagerVisibility = false;
+    private static boolean mIsDirected = false;
+    private static float sDegreeBearing;
+    private static float sDegreeTilt;
+    private static CameraPosition cameraPosition;
 
     private SOServiceDirection mSoServiceDirection;
     private List<Marker> mListMarkers = new ArrayList<>();
@@ -111,10 +118,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
     private Marker mMovingMarker;
     private Marker mBusMarker;
     private ViewPagerMarkerAdapter mAdapter;
-    private static boolean mIsViewpagerVisibility = false;
-    private static boolean mIsDirected = false;
     private CountDownTimer mCountDownTimer;
     private List<PlaceStop> mPlaceStops = new ArrayList<>();
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
 
     @AfterViews
     void afterViews() {
@@ -147,6 +154,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setPageMargin(10);
         mViewPager.setAlpha(0.8f);
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
     @OptionsItem(R.id.mnSettings)
@@ -435,9 +445,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         }
 
         // Millisecond
-        final long MIN_TIME_BW_UPDATES = 10000;
+        final long MIN_TIME_BW_UPDATES = 1000;
         // Met
-        final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+        final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
         Location myLocation;
         try {
@@ -469,7 +479,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             mCurrentMarker.setDraggable(true);
             mCurrentMarker.showInfoWindow();
 
-            final CameraPosition cameraPosition = new CameraPosition.Builder()
+            cameraPosition = new CameraPosition.Builder()
                     .target(latLng)             // Sets the center of the map to location user
                     .zoom(16)                   // Sets the zoom
                     .bearing(90)                // Sets the orientation of the camera to east
@@ -544,7 +554,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 mCurrentMarker.setDraggable(true);
                 mCurrentMarker.showInfoWindow();
 
-                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                cameraPosition = new CameraPosition.Builder()
                         .target(locationNet)             // Sets the center of the map to location user
                         .zoom(16)                   // Sets the zoom
                         .bearing(90)                // Sets the orientation of the camera to east
@@ -559,9 +569,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             @Override
             public void onMyLocationChange(Location location) {
                 if (mIsDirected) {
-                    LatLng previousLatLngMoving = new LatLng(0, 0);
                     if (mMovingMarker != null) {
-                        previousLatLngMoving = new LatLng(mMovingMarker.getPosition().latitude, mMovingMarker.getPosition().longitude);
                         mMovingMarker.remove();
                     }
                     MarkerOptions option = new MarkerOptions();
@@ -571,12 +579,9 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                     mMovingMarker = mMyMap.addMarker(option);
                     mMovingMarker.showInfoWindow();
 
-                    Double heading = SphericalUtil.computeHeading(previousLatLngMoving, new LatLng(location.getLatitude(), location.getLongitude()));
-
                     CameraPosition cameraBusPosition =
                             new CameraPosition.Builder()
                                     .target(new LatLng(location.getLatitude(), location.getLongitude()))
-                                    .bearing(heading.floatValue())
                                     .tilt(40)
                                     .zoom(16)
                                     .build();
@@ -584,6 +589,16 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 }
             }
         });
+    }
+
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -594,8 +609,10 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
             mIsDirected = false;
         }
         loadDirections(position);
-        loadTimeRemain(position);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
+        if (!Objects.equals(sPositionCarriage, DEFAULT_CARRIAGE)) {
+            loadTimeRemain(position);
+        }
+        cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(mListMarkers.get(position).getPosition().latitude, mListMarkers.get(position).getPosition().longitude))             // Sets the center of the map to location user
                 .zoom(16)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
@@ -609,6 +626,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
         } catch (Exception ignored) {
         }
         mListMarkers.get(position).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus_stop_selected));
+        mListMarkers.get(position).showInfoWindow();
         mPreviousSelectedMarker = mListMarkers.get(position);
     }
 
@@ -882,7 +900,7 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
                 mIsViewpagerVisibility = true;
                 mViewPager.setCurrentItem(idPlace, true);
 
-                CameraPosition cameraPosition = new CameraPosition.Builder()
+                cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(mListMarkers.get(idPlace).getPosition().latitude, mListMarkers.get(idPlace).getPosition().longitude))             // Sets the center of the map to location user
                         .zoom(16)                   // Sets the zoom
                         .bearing(90)                // Sets the orientation of the camera to east
@@ -935,6 +953,26 @@ public class MapActivity extends AppCompatActivity implements LocationListener, 
 
     @Override
     public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        sDegreeBearing -= Math.round(sensorEvent.values[2]);
+        if (sDegreeTilt + Math.round(sensorEvent.values[0]) >= 0 && sDegreeTilt + Math.round(sensorEvent.values[0]) <= 90) {
+            sDegreeTilt += Math.round(sensorEvent.values[0]);
+        }
+        if (mMyMap != null && cameraPosition != null && mIsDirected && sDegreeTilt >= 0 && sDegreeTilt <= 90) {
+            CameraPosition cameraPositionEvent = CameraPosition.builder(cameraPosition)
+                    .bearing(sDegreeBearing)
+                    .tilt(sDegreeTilt)
+                    .build();
+            mMyMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPositionEvent));
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
 }
